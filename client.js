@@ -8,11 +8,14 @@ var assert = require('assert');
 var restify = require('restify');
 
 
-module.exports = function(url){
-  var api = restify.createJsonClient({
-    url: url,
-    version: '*'
-  });
+module.exports = function(options){
+  var config = {version: '*'};
+
+  for (var item in options){
+    config[item] = options[item];
+  }
+  
+  var api = restify.createJsonClient(config);
 
   var client = {};
 
@@ -25,4 +28,4 @@ module.exports = function(url){
   };
 
   return client;
-}
+};
