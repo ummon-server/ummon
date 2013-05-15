@@ -41,13 +41,19 @@ module.exports = function(options){
 
 
   client.showLog = function(filter, callback){
+    if (!callback && 'function' === typeof filter){
+      callback = filter;
+    }
+
     var key = Object.keys(filter)[0];
     var val = filter[key];
 
-    api.get(url.log+'/'+key+'/'+val, function(err, req, res, result) {
+    var logUrl = (key) ? url.log+'/'+key+'/'+val : url.log;
+
+    api.get(logUrl, function(err, req, res, result) {
       assert.ifError(err);
 
-      callback(result);
+      callback(res.body); // This is weird that result is empty and res.body isn't
       api.close();
     });
   };
