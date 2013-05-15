@@ -4,7 +4,7 @@
   "description": "The API client for ummon",
   "main": "client.js",
   "scripts": {
-    "test": "npm test"
+    "test": "tap test"
   },
   "author": {
     "name": "Matt McManus",
@@ -28,6 +28,7 @@
     "restify": "~2.5.0"
   },
   "devDependencies": {
-    "tap": "~0.4.2"
+    "tap": "~0.4.2",
+    "ummon-server": "*"
   }
 }

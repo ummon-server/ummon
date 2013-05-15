@@ -17,13 +17,80 @@ module.exports = function(options){
   
   var api = restify.createJsonClient(config);
 
+  var url = {};
+  url.ps = '/ps';
+  url.log = '/log';
+  url.tasks = '/tasks';
+  url.createTask = url.tasks + '/new';
+
   var client = {};
 
-  client.ps = function(callback){
-    api.get('/ps', function(err, req, res, result) {
+
+  client.ps = function(pid, callback){
+    if (!callback && 'function' === typeof pid){
+      callback = pid;
+    }
+
+    api.get(url.ps, function(err, req, res, result) {
       assert.ifError(err);
-      
+
       callback(result);
+      api.close();
+    });
+  };
+
+
+  client.showLog = function(filter, callback){
+    var key = Object.keys(filter)[0];
+    var val = filter[key];
+
+    api.get(url.log+'/'+key+'/'+val, function(err, req, res, result) {
+      assert.ifError(err);
+
+      callback(result);
+      api.close();
+    });
+  };
+
+
+  client.getTasks = function(filter, callback){
+    var taskurl = (filter) ? url.tasks+'/'+filter : url.tasks;
+    console.log(taskurl);
+    api.get(taskurl, function(err, req, res, result) {
+      assert.ifError(err);
+
+      callback(result);
+      api.close();
+    });
+  };
+
+  
+  client.createTask = function(config, callback){
+    api.post(url.createTask, config, function(err, req, res, result) {
+      assert.ifError(err);
+
+      callback(result);
+      api.close();
+    });
+  };
+
+
+  client.updateTask = function(config, callback){
+    api.get(url.tasks + '/' + taskid, function(err, req, res, result) {
+      assert.ifError(err);
+
+      callback(result);
+      api.close();
+    });
+  };
+
+
+  client.deleteTask = function(taskid, callback){
+    api.get(url.tasks + '/' + taskid, function(err, req, res, result) {
+      assert.ifError(err);
+
+      callback(result);
+      api.close();
     });
   };
 
