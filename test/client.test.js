@@ -25,7 +25,7 @@ test('Show processes', function(t){
 test('Return logs', function(t){
   t.plan(1);
 
-  ummon.showLog({'collection':'sample'}, function(data){
+  ummon.showLog({'collection':'default'}, function(data){
     t.ok(data, 'showLog returns data');
   });
 });
@@ -42,7 +42,7 @@ test('Create a task', function(t){
 
 test('Show a task', function(t){
   t.plan(1);
-  ummon.getTasks('default.test', function(data){
+  ummon.getTasks('default.test', function(err, data){
     t.ok(data, 'createTask returns data');
   });
 });

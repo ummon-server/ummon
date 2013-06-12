@@ -22,8 +22,14 @@ module.exports = function(options){
   url.log = '/log';
   url.tasks = '/tasks';
   url.createTask = url.tasks + '/new';
+  url.collections = '/collections';
 
   var client = {};
+
+
+  client.basicAuth = function(user, pass){
+    api.basicAuth(user, pass);
+  };
 
 
   client.ps = function(pid, callback){
@@ -40,32 +46,46 @@ module.exports = function(options){
   };
 
 
-  client.showLog = function(filter, callback){
-    if (!callback && 'function' === typeof filter){
-      callback = filter;
+  client.showLog = function(options, callback){
+    if (!callback && 'function' === typeof options){
+      callback = options;
     }
 
-    var key = Object.keys(filter)[0];
-    var val = filter[key];
+    var key = Object.keys(options.filter)[0];
+    var val = options[key];
 
     var logUrl = (key) ? url.log+'/'+key+'/'+val : url.log;
-
+    logUrl+="?lines="+options.lines;
     api.get(logUrl, function(err, req, res, result) {
-      assert.ifError(err);
-
-      callback(res.body); // This is weird that result is empty and res.body isn't
+      callback(err, res.body); // This is weird that result is empty and res.body isn't
       api.close();
     });
   };
 
 
-  client.getTasks = function(filter, callback){
-    var taskurl = (filter) ? url.tasks+'/'+filter : url.tasks;
-    console.log(taskurl);
+  client.getTask = function(options, callback){
+    if (!callback && "function" === typeof options) {
+      callback = options;
+      options = false;
+    }
+    // URL BUILDER!
+    var taskurl;
+    if (options.collection) {
+      taskurl = url.collections + '/' + options.collection;
+    } else if (options.all) {
+      taskurl = url.tasks;
+    } else if (options.task) { 
+      taskurl = url.tasks + '/' + options.task;
+    } else {
+      return callback('What am I supposed to show? If you want all tasks use --all');
+    }
+    
     api.get(taskurl, function(err, req, res, result) {
-      assert.ifError(err);
-
-      callback(result);
+      if (err) {
+        return callback(err);
+      }
+  
+      callback(null, result);
       api.close();
     });
   };
@@ -82,7 +102,7 @@ module.exports = function(options){
 
 
   client.updateTask = function(config, callback){
-    api.get(url.tasks + '/' + taskid, function(err, req, res, result) {
+    api.put(url.tasks + '/' + config.taskid, config, function(err, req, res, result) {
       assert.ifError(err);
 
       callback(result);
