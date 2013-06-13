@@ -9,14 +9,6 @@ var restify = require('restify');
 
 
 module.exports = function(options){
-  var config = {version: '*'};
-
-  for (var item in options){
-    config[item] = options[item];
-  }
-  
-  var api = restify.createJsonClient(config);
-
   var url = {};
   url.ps = '/ps';
   url.log = '/log';
@@ -24,7 +16,29 @@ module.exports = function(options){
   url.createTask = url.tasks + '/new';
   url.collections = '/collections';
 
+  var api = false;
   var client = {};
+
+
+  /**
+   * Setup the restify client
+   * 
+   * @param  {object} options Restify client options like url, timeout and retries
+   */
+  client.configure = function(options){
+    if (!options) { options = {}; }
+    var config = {};
+
+    // Cheap and dirty default values.
+    config.version = '*';
+    config.url = options.url || 'http://localhost:8888';
+    if (options.retry) { config.retry = {"retries":options.retry} };
+    config.timeout = options.timeout || 1;
+    
+    api = restify.createJsonClient(config);
+  };
+
+  client.configure(options);
 
 
   client.basicAuth = function(user, pass){
