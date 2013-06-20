@@ -32,12 +32,12 @@ module.exports = function(options){
     // Cheap and dirty default values.
     config.version = '*';
     config.url = options.url || 'http://localhost:8888';
-    if (options.retry) { config.retry = {"retries":options.retry} };
+    if (options.retry) { config.retry = {"retries":options.retry}; }
     config.timeout = options.timeout || 1;
     
     api = restify.createJsonClient(config);
   };
-
+  // Configure the restify client
   client.configure(options);
 
 
@@ -52,9 +52,7 @@ module.exports = function(options){
     }
 
     api.get(url.ps, function(err, req, res, result) {
-      assert.ifError(err);
-
-      callback(result);
+      callback(err, result);
       api.close();
     });
   };
@@ -95,6 +93,7 @@ module.exports = function(options){
     }
     
     api.get(taskurl, function(err, req, res, result) {
+      // console.log(err, result);
       if (err) {
         return callback(err);
       }
@@ -107,9 +106,11 @@ module.exports = function(options){
   
   client.createTask = function(config, callback){
     api.post(url.createTask, config, function(err, req, res, result) {
-      assert.ifError(err);
+      if (err) {
+        return callback(err);
+      }
 
-      callback(result);
+      callback(null, result);
       api.close();
     });
   };
@@ -117,19 +118,19 @@ module.exports = function(options){
 
   client.updateTask = function(config, callback){
     api.put(url.tasks + '/' + config.taskid, config, function(err, req, res, result) {
-      assert.ifError(err);
+      if (err) {
+        return callback(err);
+      }
 
-      callback(result);
+      callback(null, result);
       api.close();
     });
   };
 
 
   client.deleteTask = function(taskid, callback){
-    api.get(url.tasks + '/' + taskid, function(err, req, res, result) {
-      assert.ifError(err);
-
-      callback(result);
+    api.del(url.tasks + '/' + taskid, function(err, req, res) {
+      callback(err);
       api.close();
     });
   };
