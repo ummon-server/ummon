@@ -36,6 +36,10 @@ module.exports = function(options){
     config.timeout = options.timeout || 1;
     
     api = restify.createJsonClient(config);
+
+    if (options.username && options.password) {
+      api.basicAuth(options.username, options.password);
+    }
   };
   // Configure the restify client
   client.configure(options);
