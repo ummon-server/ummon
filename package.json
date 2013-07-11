@@ -25,7 +25,7 @@
   },
   "readmeFilename": "README.md",
   "dependencies": {
-    "restify": "~2.5.0"
+    "restify": "~2.6.0"
   },
   "devDependencies": {
     "tap": "~0.4.2",
