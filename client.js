@@ -22,7 +22,7 @@ module.exports = function(options){
 
   /**
    * Setup the restify client
-   * 
+   *
    * @param  {object} options Restify client options like url, timeout and retries
    */
   client.configure = function(options){
@@ -34,7 +34,7 @@ module.exports = function(options){
     config.url = options.url || 'http://localhost:8888';
     if (options.retry) { config.retry = {"retries":options.retry}; }
     config.timeout = options.timeout || 1;
-    
+
     api = restify.createJsonClient(config);
 
     if (options.username && options.password) {
@@ -79,6 +79,22 @@ module.exports = function(options){
   };
 
 
+  client.getCollectionDefaults = function(collection, callback) {
+    api.get(url.collections+'/'+collection+'/defaults', function(err, req, res, result) {
+      callback(err, result);
+      api.close();
+    });
+  };
+
+
+  client.setCollectionDefaults = function(collection, config, callback) {
+    api.put(url.collections+'/'+collection+'/defaults', config, function(err, req, res, result) {
+      callback(err, result);
+      api.close();
+    });
+  };
+
+
   client.getTask = function(options, callback){
     if (!callback && "function" === typeof options) {
       callback = options;
@@ -90,24 +106,24 @@ module.exports = function(options){
       taskurl = url.collections + '/' + options.collection;
     } else if (options.all) {
       taskurl = url.tasks;
-    } else if (options.task) { 
+    } else if (options.task) {
       taskurl = url.tasks + '/' + options.task;
     } else {
       return callback('What am I supposed to show? If you want all tasks use --all');
     }
-    
+
     api.get(taskurl, function(err, req, res, result) {
       // console.log(err, result);
       if (err) {
         return callback(err);
       }
-  
+
       callback(null, result);
       api.close();
     });
   };
 
-  
+
   client.createTask = function(config, callback){
     api.post(url.createTask, config, function(err, req, res, result) {
       if (err) {
