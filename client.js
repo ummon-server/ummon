@@ -6,17 +6,18 @@
  */
 var assert = require('assert');
 var restify = require('restify');
+var url = require('url');
 
 
 module.exports = function(options){
-  var url = {};
-  url.ps = '/ps';
-  url.config = '/config';
-  url.status = '/status';
-  url.log = '/log';
-  url.tasks = '/tasks';
-  url.createTask = url.tasks + '/new';
-  url.collections = '/collections';
+  var apiUrls = {};
+  apiUrls.ps = '/ps';
+  apiUrls.config = '/config';
+  apiUrls.status = '/status';
+  apiUrls.log = '/log';
+  apiUrls.tasks = '/tasks';
+  apiUrls.createTask = apiUrls.tasks + '/new';
+  apiUrls.collections = '/collections';
 
   var api = false;
   var client = {};
@@ -57,21 +58,33 @@ module.exports = function(options){
       callback = pid;
     }
 
-    api.get(url.ps, function(err, req, res, result) {
+    api.get(apiUrls.ps, function(err, req, res, result) {
       callback(err, result);
       api.close();
     });
   };
 
+
   client.getStatus = function(callback) {
-    api.get(url.status, function(err, req, res, result) {
+    api.get(apiUrls.status, function(err, req, res, result) {
       callback(err, result);
       api.close();
     })
   };
 
+
   client.getConfig = function(callback) {
-    api.get(url.config, function(err, req, res, result) {
+    api.get(apiUrls.config, function(err, req, res, result) {
+      callback(err, result);
+      api.close();
+    })
+  };
+
+  client.setConfig = function(options, callback) {
+    var setConfigUrl = url.parse(apiUrls.config);
+    setConfigUrl.query = options;
+    setConfigUrl = url.format(setConfigUrl);
+    api.put(setConfigUrl, function(err, req, res, result) {
       callback(err, result);
       api.close();
     })
@@ -86,17 +99,18 @@ module.exports = function(options){
     var key = Object.keys(options.filter)[0];
     var val = options[key];
 
-    var logUrl = (key) ? url.log+'/'+key+'/'+val : url.log;
+    var logUrl = (key) ? apiUrls.log+'/'+key+'/'+val : apiUrls.log;
     logUrl+="?lines="+options.lines;
+    console.log(logUrl)
     api.get(logUrl, function(err, req, res, result) {
+      console.log(err, result.length)
       callback(err, res.body); // This is weird that result is empty and res.body isn't
       api.close();
     });
   };
 
-
   client.getCollectionDefaults = function(collection, callback) {
-    api.get(url.collections+'/'+collection+'/defaults', function(err, req, res, result) {
+    api.get(apiUrls.collections+'/'+collection+'/defaults', function(err, req, res, result) {
       callback(err, result);
       api.close();
     });
@@ -104,7 +118,7 @@ module.exports = function(options){
 
 
   client.setCollectionDefaults = function(collection, config, callback) {
-    api.put(url.collections+'/'+collection+'/defaults', config, function(err, req, res, result) {
+    api.put(apiUrls.collections+'/'+collection+'/defaults', config, function(err, req, res, result) {
       callback(err, result);
       api.close();
     });
@@ -119,11 +133,11 @@ module.exports = function(options){
     // URL BUILDER!
     var taskurl;
     if (options.collection) {
-      taskurl = url.collections + '/' + options.collection;
+      taskurl = apiUrls.collections + '/' + options.collection;
     } else if (options.all) {
-      taskurl = url.tasks;
+      taskurl = apiUrls.tasks;
     } else if (options.task) {
-      taskurl = url.tasks + '/' + options.task;
+      taskurl = apiUrls.tasks + '/' + options.task;
     } else {
       return callback('What am I supposed to show? If you want all tasks use --all');
     }
@@ -141,7 +155,7 @@ module.exports = function(options){
 
 
   client.createTask = function(config, callback){
-    api.post(url.createTask, config, function(err, req, res, result) {
+    api.post(apiUrls.createTask, config, function(err, req, res, result) {
       if (err) {
         return callback(err);
       }
@@ -153,7 +167,7 @@ module.exports = function(options){
 
 
   client.updateTask = function(config, callback){
-    api.put(url.tasks + '/' + config.taskid, config, function(err, req, res, result) {
+    api.put(apiUrls.tasks + '/' + config.taskid, config, function(err, req, res, result) {
       if (err) {
         return callback(err);
       }
@@ -165,7 +179,7 @@ module.exports = function(options){
 
 
   client.deleteTask = function(taskid, callback){
-    api.del(url.tasks + '/' + taskid, function(err, req, res) {
+    api.del(apiUrls.tasks + '/' + taskid, function(err, req, res) {
       callback(err);
       api.close();
     });
