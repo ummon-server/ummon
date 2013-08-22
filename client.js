@@ -11,6 +11,8 @@ var restify = require('restify');
 module.exports = function(options){
   var url = {};
   url.ps = '/ps';
+  url.config = '/config';
+  url.status = '/status';
   url.log = '/log';
   url.tasks = '/tasks';
   url.createTask = url.tasks + '/new';
@@ -59,6 +61,20 @@ module.exports = function(options){
       callback(err, result);
       api.close();
     });
+  };
+
+  client.getStatus = function(callback) {
+    api.get(url.status, function(err, req, res, result) {
+      callback(err, result);
+      api.close();
+    })
+  };
+
+  client.getConfig = function(callback) {
+    api.get(url.config, function(err, req, res, result) {
+      callback(err, result);
+      api.close();
+    })
   };
 
 
