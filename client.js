@@ -125,7 +125,15 @@ module.exports = function(options){
   };
 
 
-  client.getTask = function(options, callback){
+  client.setTasks = function(collection, config, callback) {
+    api.put(apiUrls.collections+'/'+collection, config, function(err, req, res, result) {
+      callback(err, result);
+      api.close();
+    });
+  };
+
+
+  client.getTasks = function(options, callback){
     if (!callback && "function" === typeof options) {
       callback = options;
       options = false;
@@ -149,7 +157,7 @@ module.exports = function(options){
       }
 
       callback(null, result);
-      api.close();
+      // api.close();
     });
   };
 
