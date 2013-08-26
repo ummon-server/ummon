@@ -133,6 +133,40 @@ module.exports = function(options){
   };
 
 
+  client.enableTasks = function(options, callback) {
+    var enableTasksUrl;
+    if (options.collection) {
+      enableTasksUrl = apiUrls.collections+'/'+options.collection + '/enable'
+    } else if (options.task) {
+      enableTasksUrl = apiUrls.tasks+'/' + options.task + '/enable'
+    } else {
+      return callback(new Error('You did not specify a collection or task to enable'));
+    }
+
+    api.put(enableTasksUrl, function(err, req, res, result) {
+      callback(err, result);
+      api.close();
+    });
+  };
+
+
+  client.disableTasks = function(options, callback) {
+    var disableTasksUrl;
+    if (options.collection) {
+      disableTasksUrl = apiUrls.collections+'/'+options.collection + '/disable'
+    } else if (options.task) {
+      disableTasksUrl = apiUrls.tasks+'/' + options.task + '/disable'
+    } else {
+      return callback(new Error('You did not specify a collection or task to disable'));
+    }
+
+    api.put(disableTasksUrl, function(err, req, res, result) {
+      callback(err, result);
+      api.close();
+    });
+  };
+
+
   client.getTasks = function(options, callback){
     if (!callback && "function" === typeof options) {
       callback = options;
