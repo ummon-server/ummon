@@ -60,7 +60,6 @@ module.exports = function(options){
 
     api.get(apiUrls.ps, function(err, req, res, result) {
       callback(err, result);
-      api.close();
     });
   };
 
@@ -68,7 +67,6 @@ module.exports = function(options){
   client.getStatus = function(callback) {
     api.get(apiUrls.status, function(err, req, res, result) {
       callback(err, result);
-      api.close();
     })
   };
 
@@ -76,7 +74,6 @@ module.exports = function(options){
   client.getConfig = function(callback) {
     api.get(apiUrls.config, function(err, req, res, result) {
       callback(err, result);
-      api.close();
     })
   };
 
@@ -86,7 +83,6 @@ module.exports = function(options){
     setConfigUrl = url.format(setConfigUrl);
     api.put(setConfigUrl, function(err, req, res, result) {
       callback(err, result);
-      api.close();
     })
   };
 
@@ -108,14 +104,12 @@ module.exports = function(options){
 
     api.get(logUrl, function(err, req, res, result) {
       callback(err, res.body); // This is weird that result is empty and res.body isn't
-      api.close();
-    });
+          });
   };
 
   client.getCollectionDefaults = function(collection, callback) {
     api.get(apiUrls.collections+'/'+collection+'/defaults', function(err, req, res, result) {
       callback(err, result);
-      api.close();
     });
   };
 
@@ -123,7 +117,6 @@ module.exports = function(options){
   client.setCollectionDefaults = function(collection, config, callback) {
     api.put(apiUrls.collections+'/'+collection+'/defaults', config, function(err, req, res, result) {
       callback(err, result);
-      api.close();
     });
   };
 
@@ -131,7 +124,6 @@ module.exports = function(options){
   client.setTasks = function(collection, config, callback) {
     api.put(apiUrls.collections+'/'+collection, config, function(err, req, res, result) {
       callback(err, result);
-      api.close();
     });
   };
 
@@ -151,7 +143,6 @@ module.exports = function(options){
         err = new Error('Collection already disabled')
       }
       callback(err, result);
-      api.close();
     });
   };
 
@@ -171,7 +162,6 @@ module.exports = function(options){
         err = new Error('Collection already disabled')
       }
       callback(err, result);
-      api.close();
     });
   };
 
@@ -200,7 +190,6 @@ module.exports = function(options){
       }
 
       callback(null, result);
-      api.close();
     });
   };
 
@@ -212,7 +201,6 @@ module.exports = function(options){
       }
 
       callback(null, result);
-      api.close();
     });
   };
 
@@ -224,15 +212,19 @@ module.exports = function(options){
       }
 
       callback(null, result);
-      api.close();
-    });
+          });
   };
 
 
   client.deleteTask = function(taskid, callback){
     api.del(apiUrls.tasks + '/' + taskid, function(err, req, res) {
       callback(err);
-      api.close();
+    });
+  };
+
+  client.deleteCollection = function(collection, callback){
+    api.del(apiUrls.collections + '/' + collection, function(err, req, res) {
+      callback(err);
     });
   };
 
