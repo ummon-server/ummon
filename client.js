@@ -175,12 +175,10 @@ module.exports = function(options){
     var taskurl;
     if (options.collection) {
       taskurl = apiUrls.collections + '/' + options.collection;
-    } else if (options.all) {
-      taskurl = apiUrls.tasks;
     } else if (options.task) {
       taskurl = apiUrls.tasks + '/' + options.task;
     } else {
-      return callback('What am I supposed to show? If you want all tasks use --all');
+      taskurl = apiUrls.tasks;
     }
 
     api.get(taskurl, function(err, req, res, result) {
