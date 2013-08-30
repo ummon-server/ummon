@@ -101,9 +101,12 @@ module.exports = function(options){
 
     var logUrl = (key) ? apiUrls.log+'/'+key+'/'+val : apiUrls.log;
     logUrl+="?lines="+options.lines;
-    console.log(logUrl)
+
+    if (options.runsOnly) {
+      logUrl+="&runsOnly=true";
+    }
+
     api.get(logUrl, function(err, req, res, result) {
-      console.log(err, result.length)
       callback(err, res.body); // This is weird that result is empty and res.body isn't
       api.close();
     });
@@ -191,7 +194,7 @@ module.exports = function(options){
       }
 
       callback(null, result);
-      // api.close();
+      api.close();
     });
   };
 
