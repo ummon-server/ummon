@@ -147,6 +147,9 @@ module.exports = function(options){
     }
 
     api.put(enableTasksUrl, function(err, req, res, result) {
+      if (res.statusCode === 304) {
+        err = new Error('Collection already disabled')
+      }
       callback(err, result);
       api.close();
     });
@@ -164,6 +167,9 @@ module.exports = function(options){
     }
 
     api.put(disableTasksUrl, function(err, req, res, result) {
+      if (res.statusCode === 304) {
+        err = new Error('Collection already disabled')
+      }
       callback(err, result);
       api.close();
     });
