@@ -1,5 +1,5 @@
 {
-  "name": "ummon",
+  "name": "ummon-client",
   "version": "0.0.8",
   "description": "The API client for ummon",
   "main": "client.js",
@@ -11,17 +11,17 @@
     "email": "mcmanus@punkave.com"
   },
   "bugs": {
-    "url": "https://github.com/punkave/ummon/issues"
+    "url": "https://github.com/punkave/ummon-client/issues"
   },
   "licenses": [
     {
       "type": "MIT",
-      "url": "https://github.com/punkave/ummon/blob/master/LICENSE-MIT"
+      "url": "https://github.com/punkave/ummon-client/blob/master/LICENSE-MIT"
     }
   ],
   "repository": {
     "type": "git",
-    "url": "git://github.com/punkave/ummon.git"
+    "url": "git://github.com/punkave/ummon-client.git"
   },
   "readmeFilename": "README.md",
   "dependencies": {
