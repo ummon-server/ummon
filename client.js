@@ -1,7 +1,7 @@
 'use strict';
 
 
-/**
+/*!
  * Module dependencies.
  */
 var assert = require('assert');
@@ -48,22 +48,30 @@ module.exports = function(options){
   client.configure(options);
 
 
+  /**
+   * Authenticate your client
+   *
+   * If you pass username and password keys to the constructor
+   * it will authenticate for you
+   *
+   * @see client.configure()
+   * @param  {String} user
+   * @param  {String} pass
+   */
   client.basicAuth = function(user, pass){
     api.basicAuth(user, pass);
   };
 
 
-  client.ps = function(pid, callback){
-    if (!callback && 'function' === typeof pid){
-      callback = pid;
-    }
-
-    api.get(apiUrls.ps, function(err, req, res, result) {
-      callback(err, result);
-    });
-  };
-
-
+  /**
+   * Retreive the status of your ummon server
+   *
+   * Returns:
+   *
+   *      // TODO
+   *
+   * @param  {Function} callback(err, result)
+   */
   client.getStatus = function(callback) {
     api.get(apiUrls.status, function(err, req, res, result) {
       callback(err, result);
@@ -71,12 +79,35 @@ module.exports = function(options){
   };
 
 
+  /**
+   * Return ummon-servers configuration
+   *
+   * Returns:
+   *
+   *      // TODO
+   *
+   * @param  {Function} callback(err, result)
+   */
   client.getConfig = function(callback) {
     api.get(apiUrls.config, function(err, req, res, result) {
       callback(err, result);
     })
   };
 
+
+  /**
+   * Set configuration options
+   *
+   * Example:
+   *
+   *      client.setConfig( {pause: true}, function(err, result){
+   *        console.log('Ummon has been paused');
+   *      });
+   *
+   *
+   * @param {Object} options configuration options to set
+   * @param  {Function} callback(err, result)
+   */
   client.setConfig = function(options, callback) {
     var setConfigUrl = url.parse(apiUrls.config);
     setConfigUrl.query = options;
@@ -87,6 +118,24 @@ module.exports = function(options){
   };
 
 
+  /**
+   * Return a portion of the server's log
+   *
+   * ## Example:
+   *
+   *      client.showLog({ lines: 500, filter: {collection: 'ummon'}}, function(err, result){
+   *        console.log(result)
+   *      })
+   *
+   * ## Options:
+   *
+   * * lines: The number of lines to retreive
+   * * runsOnly: Return only a history of completed tasks, without task output
+   * * filter: Object with key collection, task or run
+   *
+   * @param  {Object}   options  Options to control the filtering of the logs
+   * @param  {Function} callback callback(err, result)
+   */
   client.showLog = function(options, callback){
     if (!callback && 'function' === typeof options){
       callback = options;
@@ -102,11 +151,29 @@ module.exports = function(options){
       logUrl+="&runsOnly=true";
     }
 
+    if (options.follow) {
+      logUrl+="&follow=true";
+    }
+
     api.get(logUrl, function(err, req, res, result) {
+      // res.on('data', function(chunk){
+      //   console.log('DATA: '+ chunk)
+      // })
+
+      // res.on('data', function(chunk){
+      //   console.log('DATA: '+ chunk)
+      // })
       callback(err, res.body); // This is weird that result is empty and res.body isn't
-          });
+    });
   };
 
+
+  /**
+   * Return the defautls for a particular collection
+   *
+   * @param  {String}   collection A collection name
+   * @param  {Function} callback   callback(err, result)
+   */
   client.getCollectionDefaults = function(collection, callback) {
     api.get(apiUrls.collections+'/'+collection+'/defaults', function(err, req, res, result) {
       callback(err, result);
@@ -114,6 +181,13 @@ module.exports = function(options){
   };
 
 
+  /**
+   * Set the defaults for a particular collection
+   *
+   * @param  {String}   collection A collection name
+   * @param  {Object} config The values to set as defaults, eg: cwd
+   * @param  {Function} callback   callback(err, result)
+   */
   client.setCollectionDefaults = function(collection, config, callback) {
     api.put(apiUrls.collections+'/'+collection+'/defaults', config, function(err, req, res, result) {
       callback(err, result);
@@ -121,6 +195,13 @@ module.exports = function(options){
   };
 
 
+  /**
+   * Create a new collection. Also useful for renaming collections
+   *
+   * @param {String}   collection The new collection's name
+   * @param {Object}   config     An object containing defaults, settings and tasks
+   * @param {Function} callback   callback(err, result)
+   */
   client.setTasks = function(collection, config, callback) {
     api.put(apiUrls.collections+'/'+collection, config, function(err, req, res, result) {
       callback(err, result);
@@ -128,6 +209,21 @@ module.exports = function(options){
   };
 
 
+  /**
+   * Enable an individual task or a collection of tasks
+   *
+   * ## Examples:
+   *
+   *     // Enable a single task
+   *     client.enableTasks({ task:'ummon.doAwesome' }, callback)
+   *
+   *     // Enable a collection
+   *     client.enableTasks({ collection:'ummon' }, callback)
+   *
+   *
+   * @param  {Object}   options  Object describing what to enable
+   * @param  {Function} callback callback(err, result)
+   */
   client.enableTasks = function(options, callback) {
     var enableTasksUrl;
     if (options.collection) {
@@ -147,6 +243,21 @@ module.exports = function(options){
   };
 
 
+  /**
+   * Disable an individual task or a collection of tasks
+   *
+   * ## Examples:
+   *
+   *     // Enable a single task
+   *     client.disableTasks({ task:'ummon.doAwesome' }, callback)
+   *
+   *     // Enable a collection
+   *     client.disableTasks({ collection:'ummon' }, callback)
+   *
+   *
+   * @param  {Object}   options  Object describing what to disable
+   * @param  {Function} callback callback(err, result)
+   */
   client.disableTasks = function(options, callback) {
     var disableTasksUrl;
     if (options.collection) {
@@ -166,6 +277,12 @@ module.exports = function(options){
   };
 
 
+  /**
+   * Return an individual task or a collection of tasks
+   *
+   * @param  {Object}   options  Object describing what to get
+   * @param  {Function} callback callback(err, result)
+   */
   client.getTasks = function(options, callback){
     if (!callback && "function" === typeof options) {
       callback = options;
@@ -192,6 +309,21 @@ module.exports = function(options){
   };
 
 
+  /**
+   * Create a task
+   *
+   * ## Example
+   *
+   *      client.createTask({
+   *        collection:"ummon",
+   *        name: "doAwesome",
+   *        command: "sh fixTheWorld.sh",
+   *        trigger: {time: '1 * * * *'}},
+   *      callback)
+   *
+   * @param  {Object}   options  Object describing what to create
+   * @param  {Function} callback callback(err, result)
+   */
   client.createTask = function(config, callback){
     api.post(apiUrls.createTask, config, function(err, req, res, result) {
       if (err) {
@@ -203,6 +335,12 @@ module.exports = function(options){
   };
 
 
+  /**
+   * Update an existing task
+   *
+   * @param  {Object}   config   A tasks updated config object
+   * @param  {Function} callback callback(err, result)
+   */
   client.updateTask = function(config, callback){
     api.put(apiUrls.tasks + '/' + config.taskid, config, function(err, req, res, result) {
       if (err) {
@@ -210,16 +348,28 @@ module.exports = function(options){
       }
 
       callback(null, result);
-          });
+    });
   };
 
 
+  /**
+   * Delete a task
+   *
+   * @param  {String}   taskid
+   * @param  {Function} callback callback(err)
+   */
   client.deleteTask = function(taskid, callback){
     api.del(apiUrls.tasks + '/' + taskid, function(err, req, res) {
       callback(err);
     });
   };
 
+  /**
+   * Delete a collection, it's defaults and all tasks in it
+   *
+   * @param  {String}   collection
+   * @param  {Function} callback   callback(err)
+   */
   client.deleteCollection = function(collection, callback){
     api.del(apiUrls.collections + '/' + collection, function(err, req, res) {
       callback(err);
