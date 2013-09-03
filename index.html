@@ -120,6 +120,9 @@ pre[class*="language-"] {
 }
 /*.section-container, .section-container .section .title
   border-color #e6e6e6*/
+#nav .section-container {
+  border: none;
+}
 #nav .section.active {
   padding-top: 0 !important;
 }
@@ -144,7 +147,6 @@ pre[class*="language-"] {
   background: #ddd;
 }
 #nav ul.solo {
-  border-top: 1px solid #ccc;
   padding: 0.875em;
 }
 code {
@@ -200,6 +202,12 @@ code {
 .comment div.description h2 {
   font-size: 1.2em;
 }
+.comment div.description h3 {
+  font-size: 1.1em;
+}
+.comment div.description pre {
+  overflow-y: auto;
+}
 .comment .tags span {
   margin-right: 4px;
 }
@@ -217,7 +225,7 @@ code {
   margin-right: 6px;
   font-size: 0.7em;
 }
-</style><script srr="http://cdnjs.cloudflare.com/ajax/libs/foundation/4.1.6/js/vendor/custom.modernizr.js"></script></head><body><div class="row"><div class="small-12 columns"><h1 class="page-title">ummon-client</h1></div></div><div class="row"><div id="nav" class="large-3 columns"><div data-section="accordian" data-options="" class="section-container accordian"><div class="section active"><ul class="side-nav solo"><li><a href="#configure">configure</a></li><li><a href="#basicAuth">basicAuth</a></li><li><a href="#getStatus">getStatus</a></li><li><a href="#getConfig">getConfig</a></li><li><a href="#setConfig">setConfig</a></li><li><a href="#showLog">showLog</a></li><li><a href="#getCollectionDefaults">getCollectionDefaults</a></li><li><a href="#setCollectionDefaults">setCollectionDefaults</a></li><li><a href="#setTasks">setTasks</a></li><li><a href="#enableTasks">enableTasks</a></li><li><a href="#disableTasks">disableTasks</a></li><li><a href="#getTasks">getTasks</a></li><li><a href="#createTask">createTask</a></li></ul></div></div></div><div class="small-12 large-9 columns"><article class="comment"><header><h1 id="configure">configure</h1><h5 class="subheader"><div class="label radius ctx-type">method</div>client.configure()</h5></header><ul class="no-bullet tags"><li class="tag"><span class="type">@param: </span><span class="types">{object}</span><span class="name">options</span><span class="description">Restify client options like url, timeout and retries</span></li></ul><div data-section="accordian" data-options="one_up: false;" class="section-container code auto"><div class="section"><p data-section-title class="title"><a href="#">Description</a></p><div data-section-content class="content description"><p>Setup the restify client</p></div></div><div class="section"><p data-section-title class="title"><a href="#">Source</a></p><div data-section-content class="content"><pre><code class="language-javascript">client.configure = function(options){
+</style><script srr="http://cdnjs.cloudflare.com/ajax/libs/foundation/4.1.6/js/vendor/custom.modernizr.js"></script></head><body><div class="row"><div class="small-12 columns"><h1 class="page-title">ummon-client</h1></div></div><div class="row"><div id="nav" class="large-3 columns"><div data-section="accordian" data-options="" class="section-container accordian"><div class="section active"><ul class="side-nav solo"><li><a href="#configure">configure</a></li><li><a href="#basicAuth">basicAuth</a></li><li><a href="#getStatus">getStatus</a></li><li><a href="#getConfig">getConfig</a></li><li><a href="#setConfig">setConfig</a></li><li><a href="#showLog">showLog</a></li><li><a href="#getCollectionDefaults">getCollectionDefaults</a></li><li><a href="#setCollectionDefaults">setCollectionDefaults</a></li><li><a href="#setTasks">setTasks</a></li><li><a href="#enableTasks">enableTasks</a></li><li><a href="#disableTasks">disableTasks</a></li><li><a href="#getTasks">getTasks</a></li><li><a href="#createTask">createTask</a></li><li><a href="#updateTask">updateTask</a></li><li><a href="#deleteTask">deleteTask</a></li><li><a href="#deleteCollection">deleteCollection</a></li></ul></div></div></div><div class="small-12 large-9 columns"><article class="comment"><header><h1 id="configure">configure</h1><h5 class="subheader"><div class="label radius ctx-type">method</div>client.configure()</h5></header><ul class="no-bullet tags"><li class="tag"><span class="type">@param: </span><span class="types">{object}</span><span class="name">options</span><span class="description">Restify client options like url, timeout and retries</span></li></ul><div data-section="accordian" data-options="one_up: false;" class="section-container code auto"><div class="section"><p data-section-title class="title"><a href="#">Description</a></p><div data-section-content class="content description"><p>Setup the restify client</p></div></div><div class="section"><p data-section-title class="title"><a href="#">Source</a></p><div data-section-content class="content"><pre><code class="language-javascript">client.configure = function(options){
     if (!options) { options = {}; }
     var config = {};
 
@@ -240,13 +248,19 @@ code {
     api.basicAuth(user, pass);
   };</code></pre></div></div></div></article><article class="comment"><header><h1 id="getStatus">getStatus</h1><h5 class="subheader"><div class="label radius ctx-type">method</div>client.getStatus()</h5></header><ul class="no-bullet tags"><li class="tag"><span class="type">@param: </span><span class="types">{Function}</span><span class="name">callback(err,</span><span class="description">result)</span></li></ul><div data-section="accordian" data-options="one_up: false;" class="section-container code auto"><div class="section"><p data-section-title class="title"><a href="#">Description</a></p><div data-section-content class="content description"><p>Retreive the status of your ummon server</p>
 
-<p>Returns:</p></div></div><div class="section"><p data-section-title class="title"><a href="#">Source</a></p><div data-section-content class="content"><pre><code class="language-javascript">client.getStatus = function(callback) {
+<p>Returns:</p>
+
+<pre><code> // TODO
+</code></pre></div></div><div class="section"><p data-section-title class="title"><a href="#">Source</a></p><div data-section-content class="content"><pre><code class="language-javascript">client.getStatus = function(callback) {
     api.get(apiUrls.status, function(err, req, res, result) {
       callback(err, result);
     })
   };</code></pre></div></div></div></article><article class="comment"><header><h1 id="getConfig">getConfig</h1><h5 class="subheader"><div class="label radius ctx-type">method</div>client.getConfig()</h5></header><ul class="no-bullet tags"><li class="tag"><span class="type">@param: </span><span class="types">{Function}</span><span class="name">callback(err,</span><span class="description">result)</span></li></ul><div data-section="accordian" data-options="one_up: false;" class="section-container code auto"><div class="section"><p data-section-title class="title"><a href="#">Description</a></p><div data-section-content class="content description"><p>Return ummon-servers configuration</p>
 
-<p>Returns:</p></div></div><div class="section"><p data-section-title class="title"><a href="#">Source</a></p><div data-section-content class="content"><pre><code class="language-javascript">client.getConfig = function(callback) {
+<p>Returns:</p>
+
+<pre><code> // TODO
+</code></pre></div></div><div class="section"><p data-section-title class="title"><a href="#">Source</a></p><div data-section-content class="content"><pre><code class="language-javascript">client.getConfig = function(callback) {
     api.get(apiUrls.config, function(err, req, res, result) {
       callback(err, result);
     })
@@ -254,7 +268,10 @@ code {
 
 <p>Example:</p>
 
-<p>client.setConfig( {pause: true}, function(err, result){<br />     console.log('Ummon has been paused');<br />   });</p></div></div><div class="section"><p data-section-title class="title"><a href="#">Source</a></p><div data-section-content class="content"><pre><code class="language-javascript">client.setConfig = function(options, callback) {
+<pre><code> client.setConfig( {pause: true}, function(err, result){
+   console.log('Ummon has been paused');
+ });
+</code></pre></div></div><div class="section"><p data-section-title class="title"><a href="#">Source</a></p><div data-section-content class="content"><pre><code class="language-javascript">client.setConfig = function(options, callback) {
     var setConfigUrl = url.parse(apiUrls.config);
     setConfigUrl.query = options;
     setConfigUrl = url.format(setConfigUrl);
@@ -263,14 +280,14 @@ code {
     })
   };</code></pre></div></div></div></article><article class="comment"><header><h1 id="showLog">showLog</h1><h5 class="subheader"><div class="label radius ctx-type">method</div>client.showLog()</h5></header><ul class="no-bullet tags"><li class="tag"><span class="type">@param: </span><span class="types">{Object}</span><span class="name">options</span><span class="description">Options to control the filtering of the logs</span></li><li class="tag"><span class="type">@param: </span><span class="types">{Function}</span><span class="name">callback</span><span class="description">callback(err, result)</span></li></ul><div data-section="accordian" data-options="one_up: false;" class="section-container code auto"><div class="section"><p data-section-title class="title"><a href="#">Description</a></p><div data-section-content class="content description"><p>Return a portion of the server's log</p>
 
-<h3>Example:</h3>
+<h2>Example:</h2>
 
 <pre><code> client.showLog({ lines: 500, filter: {collection: 'ummon'}}, function(err, result){
    console.log(result)
  })
 </code></pre>
 
-<h3>Options:</h3>
+<h2>Options:</h2>
 
 <ul>
 <li>lines: The number of lines to retreive</li>
@@ -319,7 +336,7 @@ code {
     });
   };</code></pre></div></div></div></article><article class="comment"><header><h1 id="enableTasks">enableTasks</h1><h5 class="subheader"><div class="label radius ctx-type">method</div>client.enableTasks()</h5></header><ul class="no-bullet tags"><li class="tag"><span class="type">@param: </span><span class="types">{Object}</span><span class="name">options</span><span class="description">Object describing what to enable</span></li><li class="tag"><span class="type">@param: </span><span class="types">{Function}</span><span class="name">callback</span><span class="description">callback(err, result)</span></li></ul><div data-section="accordian" data-options="one_up: false;" class="section-container code auto"><div class="section"><p data-section-title class="title"><a href="#">Description</a></p><div data-section-content class="content description"><p>Enable an individual task or a collection of tasks</p>
 
-<h3>Examples:</h3>
+<h2>Examples:</h2>
 
 <pre><code>// Enable a single task
 client.enableTasks({ task:'ummon.doAwesome' }, callback)
@@ -344,7 +361,7 @@ client.enableTasks({ collection:'ummon' }, callback)
     });
   };</code></pre></div></div></div></article><article class="comment"><header><h1 id="disableTasks">disableTasks</h1><h5 class="subheader"><div class="label radius ctx-type">method</div>client.disableTasks()</h5></header><ul class="no-bullet tags"><li class="tag"><span class="type">@param: </span><span class="types">{Object}</span><span class="name">options</span><span class="description">Object describing what to disable</span></li><li class="tag"><span class="type">@param: </span><span class="types">{Function}</span><span class="name">callback</span><span class="description">callback(err, result)</span></li></ul><div data-section="accordian" data-options="one_up: false;" class="section-container code auto"><div class="section"><p data-section-title class="title"><a href="#">Description</a></p><div data-section-content class="content description"><p>Disable an individual task or a collection of tasks</p>
 
-<h3>Examples:</h3>
+<h2>Examples:</h2>
 
 <pre><code>// Enable a single task
 client.disableTasks({ task:'ummon.doAwesome' }, callback)
@@ -392,7 +409,7 @@ client.disableTasks({ collection:'ummon' }, callback)
     });
   };</code></pre></div></div></div></article><article class="comment"><header><h1 id="createTask">createTask</h1><h5 class="subheader"><div class="label radius ctx-type">method</div>client.createTask()</h5></header><ul class="no-bullet tags"><li class="tag"><span class="type">@param: </span><span class="types">{Object}</span><span class="name">options</span><span class="description">Object describing what to create</span></li><li class="tag"><span class="type">@param: </span><span class="types">{Function}</span><span class="name">callback</span><span class="description">callback(err, result)</span></li></ul><div data-section="accordian" data-options="one_up: false;" class="section-container code auto"><div class="section"><p data-section-title class="title"><a href="#">Description</a></p><div data-section-content class="content description"><p>Create a task</p>
 
-<h3>Example</h3>
+<h2>Example</h2>
 
 <pre><code> client.createTask({
    collection:"ummon",
@@ -408,27 +425,19 @@ client.disableTasks({ collection:'ummon' }, callback)
 
       callback(null, result);
     });
-  };
-
-
-  client.updateTask = function(config, callback){
+  };</code></pre></div></div></div></article><article class="comment"><header><h1 id="updateTask">updateTask</h1><h5 class="subheader"><div class="label radius ctx-type">method</div>client.updateTask()</h5></header><ul class="no-bullet tags"><li class="tag"><span class="type">@param: </span><span class="types">{Object}</span><span class="name">config</span><span class="description">A tasks updated config object</span></li><li class="tag"><span class="type">@param: </span><span class="types">{Function}</span><span class="name">callback</span><span class="description">callback(err, result)</span></li></ul><div data-section="accordian" data-options="one_up: false;" class="section-container code auto"><div class="section"><p data-section-title class="title"><a href="#">Description</a></p><div data-section-content class="content description"><p>Update an existing task</p></div></div><div class="section"><p data-section-title class="title"><a href="#">Source</a></p><div data-section-content class="content"><pre><code class="language-javascript">client.updateTask = function(config, callback){
     api.put(apiUrls.tasks + '/' + config.taskid, config, function(err, req, res, result) {
       if (err) {
         return callback(err);
       }
 
       callback(null, result);
-          });
-  };
-
-
-  client.deleteTask = function(taskid, callback){
+    });
+  };</code></pre></div></div></div></article><article class="comment"><header><h1 id="deleteTask">deleteTask</h1><h5 class="subheader"><div class="label radius ctx-type">method</div>client.deleteTask()</h5></header><ul class="no-bullet tags"><li class="tag"><span class="type">@param: </span><span class="types">{String}</span><span class="name">taskid</span><span class="description"></span></li><li class="tag"><span class="type">@param: </span><span class="types">{Function}</span><span class="name">callback</span><span class="description">callback(err)</span></li></ul><div data-section="accordian" data-options="one_up: false;" class="section-container code auto"><div class="section"><p data-section-title class="title"><a href="#">Description</a></p><div data-section-content class="content description"><p>Delete a task</p></div></div><div class="section"><p data-section-title class="title"><a href="#">Source</a></p><div data-section-content class="content"><pre><code class="language-javascript">client.deleteTask = function(taskid, callback){
     api.del(apiUrls.tasks + '/' + taskid, function(err, req, res) {
       callback(err);
     });
-  };
-
-  client.deleteCollection = function(collection, callback){
+  };</code></pre></div></div></div></article><article class="comment"><header><h1 id="deleteCollection">deleteCollection</h1><h5 class="subheader"><div class="label radius ctx-type">method</div>client.deleteCollection()</h5></header><ul class="no-bullet tags"><li class="tag"><span class="type">@param: </span><span class="types">{String}</span><span class="name">collection</span><span class="description"></span></li><li class="tag"><span class="type">@param: </span><span class="types">{Function}</span><span class="name">callback</span><span class="description">callback(err)</span></li></ul><div data-section="accordian" data-options="one_up: false;" class="section-container code auto"><div class="section"><p data-section-title class="title"><a href="#">Description</a></p><div data-section-content class="content description"><p>Delete a collection, it's defaults and all tasks in it</p></div></div><div class="section"><p data-section-title class="title"><a href="#">Source</a></p><div data-section-content class="content"><pre><code class="language-javascript">client.deleteCollection = function(collection, callback){
     api.del(apiUrls.collections + '/' + collection, function(err, req, res) {
       callback(err);
     });
@@ -457,6 +466,6 @@ Prism.languages.scss=Prism.languages.extend("css",{comment:{pattern:/(^|[^\\])(\
   $(document).foundation();
 
   $(function(){
-    $('pre code').addClass('language-javascript');
+    $('pre, pre code').addClass('language-javascript');
   //   $('#nav > ul > li > a[href$="'+location.pathname.substring(location.pathname.lastIndexOf('/')+1, location.pathname.length)+'"]').parent().addClass('active');
   })</script></body></html>
