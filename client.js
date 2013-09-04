@@ -293,6 +293,7 @@ module.exports = function(options){
     if (options.collection) {
       taskurl = apiUrls.collections + '/' + options.collection;
     } else if (options.task) {
+      if (options.task.indexOf('.*') !== -1) { options.task = options.task.substr(0, options.task.length-2)}
       taskurl = apiUrls.tasks + '/' + options.task;
     } else {
       taskurl = apiUrls.tasks;
