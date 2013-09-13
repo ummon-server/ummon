@@ -141,28 +141,30 @@ module.exports = function(options){
       callback = options;
     }
 
-    var key = Object.keys(options.filter)[0];
-    var val = options[key];
+    var query = {};
 
-    var logUrl = (key) ? apiUrls.log+'/'+key+'/'+val : apiUrls.log;
-    logUrl+="?lines="+options.lines;
+    ['filter', 'runsOnly', 'start', 'from', 'to', 'follow'].forEach(function(key){
+      if (options[key]) { query[key] = options[key]; }
+    });
 
-    if (options.runsOnly) {
-      logUrl+="&runsOnly=true";
-    }
+    // Grossly build out the url
+    var logUrl = apiUrls.log;
 
-    if (options.follow) {
-      logUrl+="&follow=true";
+    if (Object.keys(query).length) {
+      var count = 0;
+      logUrl += '?';
+      for (var key in query) {
+        if (count > 0) logUrl += '&';
+        logUrl += key + '=' + query[key];
+        count++;
+      }
     }
 
     api.get(logUrl, function(err, req, res, result) {
-      // res.on('data', function(chunk){
-      //   console.log('DATA: '+ chunk)
-      // })
+      res.on('data', function(chunk){
+        console.log('DATA: '+ chunk)
+      })
 
-      // res.on('data', function(chunk){
-      //   console.log('DATA: '+ chunk)
-      // })
       callback(err, res.body); // This is weird that result is empty and res.body isn't
     });
   };
@@ -342,8 +344,8 @@ module.exports = function(options){
    * @param  {Object}   config   A tasks updated config object
    * @param  {Function} callback callback(err, result)
    */
-  client.updateTask = function(config, callback){
-    api.put(apiUrls.tasks + '/' + config.taskid, config, function(err, req, res, result) {
+  client.updateTask = function(taskid, config, callback){
+    api.put(apiUrls.tasks + '/' + taskid, config, function(err, req, res, result) {
       if (err) {
         return callback(err);
       }
