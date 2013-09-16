@@ -35,7 +35,7 @@ module.exports = function(options){
     // Cheap and dirty default values.
     config.version = '*';
     config.url = options.url || 'http://localhost:8888';
-    if (options.retry) { config.retry = {"retries":options.retry}; }
+    if (options.retry) { config.retry = { "retries":options.retry }; }
     config.timeout = options.timeout || 1;
 
     api = restify.createJsonClient(config);
@@ -113,6 +113,34 @@ module.exports = function(options){
     setConfigUrl.query = options;
     setConfigUrl = url.format(setConfigUrl);
     api.put(setConfigUrl, function(err, req, res, result) {
+      callback(err, result);
+    })
+  };
+
+
+  /**
+   * Get the tasks currently in the queue
+   *
+   * @return {Function}            callback(err, result)
+   */
+  client.getQueue = function(callback) {
+    api.get('/queue', function(err, req, res, result) {
+      callback(err, result);
+    })
+  };
+
+
+  /**
+   * Clear the entire queue or a specific task from it
+   *
+   * @param  {String}   task     The id of the task, eg: collection.name
+   * @param  {Function} callback callback(err, result)
+   */
+  client.clearQueue = function(task, callback) {
+    var url = '/queue/clear';
+    if (task) { url += '?task=' + task; }
+
+    api.del(url, function(err, req, res, result) {
       callback(err, result);
     })
   };
