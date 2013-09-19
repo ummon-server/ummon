@@ -28,6 +28,11 @@ if (require.main === module) {
     .description('Set the default settings for a particular collection')
     .option('--cwd <path>', 'The cwd for this particular collection')
     .action(function(collection, options){
+
+      if (!collection) {
+        ummoncli.ifError(new Error('You must specify a collection'));
+      }
+
       // Gross, but this function is run before ummoncli.parse can load the config
       program = ummoncli.loadLocalConfig(program)
       client.configure(program)
@@ -45,7 +50,7 @@ if (require.main === module) {
         ummoncli.ifError(new Error('You didn\'t provide any arguments to set'));
       }
 
-      client.setCollectionDefaults(program.args[0], options, function(err, result){
+      client.setCollectionDefaults(collection, options, function(err, result){
         ummoncli.ifError(err);
 
         if (result.defaults) {
