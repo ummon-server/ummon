@@ -1,9 +1,9 @@
-# ummon
-## Javascript API Client & Command Line Tool
-
-[![NPM version](https://badge.fury.io/js/ummon.png)](http://badge.fury.io/js/ummon) [![Build Status](https://secure.travis-ci.org/punkave/ummon.png?branch=master)](http://travis-ci.org/punkave/ummon) [![Dependency Status](https://gemnasium.com/punkave/ummon.png)](https://gemnasium.com/punkave/ummon)
+# ummon [![NPM version](https://badge.fury.io/js/ummon.png)](http://badge.fury.io/js/ummon) [![Build Status](https://secure.travis-ci.org/punkave/ummon.png?branch=master)](http://travis-ci.org/punkave/ummon) [![Dependency Status](https://gemnasium.com/punkave/ummon.png)](https://gemnasium.com/punkave/ummon)
+### Javascript API Client & Command Line Tool
 
 The command line interface to the [ummon server](https://github.com/punkave/ummon-server). Since `ummon-server` only communicates over an HTTP API, you can install this module on any computer and as long as you have the url and a user and pass you can interact with it.
+
+[![NPM](https://nodei.co/npm/ummon.png?downloads=true)](https://nodei.co/npm/ummon/)
 
 # The Command Line Client
 
