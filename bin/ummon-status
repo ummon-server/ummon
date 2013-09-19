@@ -1,0 +1,68 @@
+#!/usr/bin/env node
+
+// helmsman
+
+var program = require('commander');
+var ummon = require('../client');
+var util = require('util');
+var moment = require('moment');
+var _ = require('underscore');
+
+require('colors');
+
+var ummoncli = require('../cli-utils.js');
+
+// Shorthands
+var l = console.log;
+
+// Expose meta data for helmsman
+exports.command = {
+    description: 'Get the server status as well as control various aspects of the server'
+};
+
+
+if (require.main === module) {
+  program
+    .option('-v, --verbose', 'Show verbose information');
+
+  program = ummoncli.parse(program, process.argv);
+
+  // Pass the full cli options. Clean things up in there
+  var client = ummon(program);
+
+  client.getStatus(function(err, result){
+    ummoncli.ifError(err);
+
+    l('')
+    l('Connection successfully established with ummon-server'.green)
+    l('     at '+program.url.white+' with user '+program.username.white)
+    l('')
+
+    if (result.isPaused) {
+      l('Ummon is currently paused. No new tasks will be run.'.yellow);
+      l('')
+    }
+
+    l('There are currently: ');
+      l(' - '+result.totalTasks.toString().white+' total tasks in '+result.collections.length.toString().white+' collections')
+    if (program.verbose) {
+      l('   |- '+result.activeTimers.length.toString().white + ' of which will be triggered by a timer')
+    }
+
+    l(' - '+result.workers.length.toString().white+' active workers out of a maximum of '+result.maxWorkers.toString().white)
+    if (program.verbose) {
+      _.each(result.workers, function(worker){
+        l('   |- '+worker)
+      })
+    }
+
+    l(' - '+result.queue.length.toString().white+' tasks in the queue')
+    if (program.verbose) {
+      _.each(result.queue, function(item){
+        l('   |- '+item)
+      })
+    }
+
+    process.exit();
+  });
+}

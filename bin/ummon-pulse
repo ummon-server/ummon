@@ -1,0 +1,39 @@
+#!/usr/bin/env node
+
+// helmsman
+
+var program = require('commander');
+var ummon = require('../client');
+var util = require('util');
+var moment = require('moment');
+var _ = require('underscore');
+
+require('colors');
+
+var ummoncli = require('../cli-utils.js');
+
+// Shorthands
+var l = console.log;
+
+// Expose meta data for helmsman
+exports.command = {
+    description: 'Ping server status for a queue/worker numbers'
+};
+
+
+if (require.main === module) {
+  program
+    .option('-v, --verbose', 'Show verbose information');
+
+  program = ummoncli.parse(program, process.argv);
+
+  // Pass the full cli options. Clean things up in there
+  var client = ummon(program);
+
+  setInterval(function(){
+    client.getStatus(function(err, result){
+      ummoncli.ifError(err);
+      l('Workers: ' + result.workers.length.toString().white + '/' + result.maxWorkers + ' - Queue: ' + result.queue.length.toString().white)
+    });
+  }, 1000)
+}

@@ -1,0 +1,73 @@
+#!/usr/bin/env node
+
+var util = require('util');
+var program = require('commander');
+var ummon = require('../client');
+var moment = require('moment');
+
+require('colors');
+
+var ummoncli = require('../cli-utils.js');
+
+// Shorthands
+var l = console.log;
+
+// Expose meta data to helmsman
+exports.command = {
+    description: 'Show recent log output. Filter logs by using --collection, --task or --run (only one!)'
+};
+
+
+if (require.main === module) {
+  program
+    .usage('<collection | task id | run id> [options]')
+    // .option('-f, --follow', 'Follow the logs. Think tail -f')
+    .option('--runs-only', 'Show only a history of run tasks, not task output')
+    .option('--from <time>', 'Show logs from this date. Format: "YYYY-MM-DD HH:mm". Defaults to the last 24 hours')
+    .option('--to <time>', 'Show logs to this date. Format: "YYYY-MM-DD HH:mm".');
+
+  program.on('--help', function(){
+    l('Pipe raw json to `bunyan` for more filtering and easier output')
+    l()
+    l('Examples:')
+    l()
+    l('   ummon log --runs-only --from "2013-08-29" --to "2013-08-31"')
+  })
+
+  program = ummoncli.parse(program, process.argv);
+
+  // Pass the full cli options. Clean things up in there
+  var client = ummon(program);
+
+  if (!('from' in program)) {
+    program.from = moment().subtract('h', 24).toISOString();
+  } else {
+    program.from = moment(program.from, 'YYYY-MM-DD HH:mm').toISOString();
+  }
+
+  if (program.to) {
+    program.to = moment(program.to, 'YYYY-MM-DD HH:mm').toISOString();
+  }
+
+  program.filter = program.args[0];
+
+
+
+  client.showLog(program, function(err, result){
+    ummoncli.ifError(err);
+
+    if (program.runsOnly) {
+      result.split('\n').forEach(function(line){
+        if (line) {
+          var line = JSON.parse(line);
+          var status = (line.run.exitCode == 0) ? 'SUCCESS'.green : ' ERROR '.red
+          console.log(moment(line.run.completed).toISOString().grey + ' - ' + status + ' - ' + line.run.id.grey + ' - ' + line.run.task.id)
+        }
+      })
+    } else {
+      l(result);
+    }
+
+    process.exit();
+  });
+}

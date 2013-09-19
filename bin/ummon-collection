@@ -1,0 +1,253 @@
+#!/usr/bin/env node
+
+var program = require('commander');
+var ummon = require('../client');
+var path = require('path');
+var util = require('util');
+var colors = require('colors');
+var _ = require('underscore');
+
+var ummoncli = require('../cli-utils.js');
+
+// Shorthands
+var l = console.log;
+
+// Expose meta data for helmsman
+exports.command = {
+    description: 'Set the default settings for a particular collection'
+};
+
+
+if (require.main === module) {
+
+  // Load the API client
+  var client = ummon();
+
+  program
+    .command('set-defaults [collection]')
+    .description('Set the default settings for a particular collection')
+    .option('--cwd <path>', 'The cwd for this particular collection')
+    .action(function(collection, options){
+      // Gross, but this function is run before ummoncli.parse can load the config
+      program = ummoncli.loadLocalConfig(program)
+      client.configure(program)
+
+      // Figure out what to pass to the api client
+      var options = {};
+      var defaultsKeys = ['cwd'];
+      defaultsKeys.forEach(function(key){
+        if (program.args[1][key]) {
+          options[key] = program.args[1][key];
+        }
+      })
+
+      if (_.isEmpty(options)){
+        ummoncli.ifError(new Error('You didn\'t provide any arguments to set'));
+      }
+
+      client.setCollectionDefaults(program.args[0], options, function(err, result){
+        ummoncli.ifError(err);
+
+        if (result.defaults) {
+          l('');
+          l(result.message)
+          l('');
+          l('Defaults for collection: %s', result.collection)
+          l('')
+          for (var key in result.defaults) {
+            ummoncli.formatKeyVal(key, result.defaults[key]);
+          }
+        }
+
+        process.exit()
+      });
+    });
+
+
+  program
+    .command('get-defaults <collection>')
+    .description('Get the default settings for a particular collection')
+    .option('--cwd <path>', 'The cwd for this particular collection')
+    .action(function(collection, options){
+      // Gross, but this function is run before ummoncli.parse can load the config
+      program = ummoncli.loadLocalConfig(program)
+      client.configure(program)
+
+      client.getCollectionDefaults(program.args[0], function(err, result){
+        ummoncli.ifError(err);
+
+        if (result.defaults) {
+          l('');
+          l('Defaults for collection: %s', result.collection)
+          l('')
+          for (var key in result.defaults) {
+            ummoncli.formatKeyVal(key, result.defaults[key]);
+          }
+        }
+        process.exit()
+      });
+    });
+
+
+  program
+    .command('copy <srcCollection> <destCollection>')
+    .description('Copy all of the settings from one collection to another')
+    .action(function(srcCollection, destCollection, options){
+      // Gross, but this function is run before ummoncli.parse can load the config
+      program = ummoncli.loadLocalConfig(program);
+      client.configure(program);
+
+      client.getTasks({collection:srcCollection}, function(err, result){
+        ummoncli.ifError(err);
+
+        var newCollection = result.collections[0];
+        newCollection.collection = destCollection;
+        newCollection.config.enabled = false;
+
+        for (var task in newCollection.tasks) {
+          newCollection.tasks[task].collection = destCollection;
+          if (newCollection.tasks[task].trigger.afterFailed) {
+            newCollection.tasks[task].trigger.afterFailed = newCollection.tasks[task].trigger.afterFailed.replace(srcCollection, destCollection)
+          }
+          if (newCollection.tasks[task].trigger.after) {
+            newCollection.tasks[task].trigger.after = newCollection.tasks[task].trigger.after.replace(srcCollection, destCollection)
+          }
+          if ("string" === typeof newCollection.tasks[task].trigger) {
+            newCollection.tasks[task].trigger = newCollection.tasks[task].trigger.replace(srcCollection, destCollection)
+          }
+        }
+
+        client.setTasks(destCollection, newCollection, function(err, collection){
+          ummoncli.ifError(err);
+          l('')
+          l('Collection %s created from %s'.green, destCollection, srcCollection)
+          l('')
+          l('Please make any changes to it\'s settings and enable')
+          process.exit()
+        })
+      });
+    });
+
+
+    // This is gross. Sorry
+    program
+      .command('rename <oldCollectionName> <newCollectionName>')
+      .description('Rename a collection')
+      .action(function(oldCollectionName, newCollectionName, options){
+        // Gross, but this function is run before ummoncli.parse can load the config
+        program = ummoncli.loadLocalConfig(program);
+        client.configure(program);
+
+        client.getTasks({collection:oldCollectionName}, function(err, result){
+          ummoncli.ifError(err);
+
+          var newCollection = result.collections[0];
+          newCollection.collection = newCollectionName;
+
+          for (var task in newCollection.tasks) {
+            delete newCollection.tasks[task].id;
+            newCollection.tasks[task].collection = newCollectionName;
+
+            if (newCollection.tasks[task].trigger.afterFailed) {
+              newCollection.tasks[task].trigger.afterFailed = newCollection.tasks[task].trigger.afterFailed.replace(oldCollectionName, newCollectionName)
+            }
+            if (newCollection.tasks[task].trigger.after) {
+              newCollection.tasks[task].trigger.after = newCollection.tasks[task].trigger.after.replace(oldCollectionName, newCollectionName)
+            }
+            if ("string" === typeof newCollection.tasks[task].trigger) {
+              newCollection.tasks[task].trigger = newCollection.tasks[task].trigger.replace(oldCollectionName, newCollectionName)
+            }
+          }
+
+          client.setTasks(newCollectionName, newCollection, function(err, collection){
+            ummoncli.ifError(err);
+            client.deleteCollection(oldCollectionName, function(err, result){
+              l('')
+              l('Collection %s renamed to %s'.green, oldCollectionName, newCollectionName)
+              process.exit()
+            })
+          })
+        });
+      });
+
+
+   program
+    .command('disable <collection>')
+    .description('Disable a collection')
+    .action(function(collection, options){
+      // Gross, but this function is run before ummoncli.parse can load the config
+      program = ummoncli.loadLocalConfig(program);
+      client.configure(program);
+
+      client.disableTasks({"collection":collection}, function(err, result){
+        ummoncli.ifError(err);
+
+        l(result.message.green);
+        l('')
+        l('The following tasks have been disabled:')
+        result.tasksDisabled.forEach(function(task){
+          l(' - '+task)
+        })
+        process.exit()
+      })
+    })
+
+  program
+    .command('enable <collection>')
+    .description('Enable a collection')
+    .action(function(collection, options){
+      // Gross, but this function is run before ummoncli.parse can load the config
+      program = ummoncli.loadLocalConfig(program);
+      client.configure(program);
+
+      client.enableTasks({"collection":collection}, function(err, result){
+        ummoncli.ifError(err);
+        l(result.message.green);
+        l('')
+        l('The following tasks have been enabled:')
+        result.tasksEnabled.forEach(function(task){
+          l(' - '+task)
+        })
+        process.exit()
+      })
+    });
+
+  program
+    .command('delete <collection>')
+    .description('Enable a collection')
+    .action(function(collection, options){
+      // Gross, but this function is run before ummoncli.parse can load the config
+      program = ummoncli.loadLocalConfig(program);
+      client.configure(program);
+
+      client.deleteCollection(collection, function(err, result){
+        ummoncli.ifError(err);
+        l('')
+        l("Collection succesfully deleted".green);
+        process.exit()
+      })
+    });
+
+  program = ummoncli.parse(program, process.argv);
+
+
+  // If no commands are presented, show a list of collections
+  if (program.args.length === 0) {
+    // Still need to config the client
+    client.configure(program);
+    program.all = true;
+
+    client.getTasks(program, function(err, result){
+      ummoncli.ifError(err);
+
+      l('There are currently ' + result.collections.length + ' configured collections')
+
+      result.collections.forEach(function(collection){
+        var enabled = (collection.config.enabled) ? 'enabled'.green : 'disabled'.red
+        l(' - ' + collection.collection.white + ' - ' + _.size(collection.tasks) +  ' tasks - (' + enabled + ')')
+      })
+      process.exit()
+    })
+
+  }
+}

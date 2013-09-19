@@ -1,0 +1,90 @@
+#!/usr/bin/env node
+
+var program = require('commander');
+var ummon = require('../client');
+var path = require('path');
+var util = require('util');
+var colors = require('colors');
+var _ = require('underscore');
+
+var ummoncli = require('../cli-utils.js');
+
+// Shorthands
+var l = console.log;
+
+// Expose meta data for helmsman
+exports.command = {
+    description: 'Show or clear the queue'
+};
+
+
+if (require.main === module) {
+
+  // Load the API client
+  var client = ummon();
+
+  program
+    .command('clear [taskID]')
+    .description('Clear the entire queue or specify a specific task to remove')
+    .action(function(filter, rawOptions){
+      program = ummoncli.loadLocalConfig(program);
+      client.configure(program);
+
+      client.clearQueue(filter, function(err) {
+        ummoncli.ifError(err);
+        l()
+        l('Queue successfully cleared'.green);
+        l()
+        showQueue();
+      })
+    });
+
+
+  program
+    .command('show')
+    .description('Show the tasks currently in the queue')
+    .action(function(taskid, options){
+      showQueue(options)
+    })
+
+  program.on('--help', function(){
+    l()
+    l('Examples:')
+    l()
+    l('   ummon queue clear task.name')
+    l()
+  })
+
+  program = ummoncli.parse(program, process.argv);
+
+  // If no arguments are provided, show every task
+  if (program.args.length === 0) {
+    showQueue()
+  }
+
+  /**
+   * showTasks
+   *
+   * @param  {String} taskid
+   * @param  {Object} options commander.js object
+   */
+  function showQueue(options){
+    program = ummoncli.loadLocalConfig(program);
+    client.configure(program);
+
+    client.getQueue(function(err, response){
+      ummoncli.ifError(err);
+
+      if (response.queue.length) {
+        l('Your queue currently has ' + response.queue.length.toString().white + ' runs:')
+        _.each(result.queue, function(item){
+          l('   |- '+item)
+        })
+      } else {
+        l('Your queue is currently ' + 'empty'.white)
+      }
+
+      process.exit()
+    })
+  }
+}

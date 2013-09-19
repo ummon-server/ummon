@@ -1,0 +1,57 @@
+#!/usr/bin/env node
+
+// helmsman
+
+var program = require('commander');
+var ummon = require('../client');
+var colors = require('colors');
+var util = require('util');
+
+var ummoncli = require('../cli-utils.js');
+
+// Shorthands
+var l = console.log;
+
+// Expose meta data for helmsman
+exports.command = {
+    description: 'Get the server status as well as control various aspects of the server'
+};
+
+
+if (require.main === module) {
+  program
+    .option('--pause', 'Pause the sever. (Prevents new jobs from being started)')
+    .option('--unpause', 'UnPause the sever');
+
+  program = ummoncli.parse(program, process.argv);
+
+  // Pass the full cli options. Clean things up in there
+  var client = ummon(program);
+
+  if (program.pause) {
+    client.setConfig( {pause: true}, function(err, result){
+      ummoncli.ifError(err);
+
+      l('Ummon has been paused');
+
+      process.exit();
+    });
+
+  } else if (program.unpause) {
+    client.setConfig( {pause: false}, function(err, result){
+      ummoncli.ifError(err);
+
+      l('Ummon is no longer paused');
+
+      process.exit();
+    });
+  } else {
+    client.getConfig(function(err, result){
+      ummoncli.ifError(err);
+
+      ummoncli.formatJson(result)
+
+      process.exit();
+    });
+  }
+};

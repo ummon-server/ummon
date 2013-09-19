@@ -1,0 +1,313 @@
+#!/usr/bin/env node
+
+var program = require('commander');
+var ummon = require('../client');
+var path = require('path');
+var util = require('util');
+var colors = require('colors');
+var _ = require('underscore');
+
+var ummoncli = require('../cli-utils.js');
+
+// Shorthands
+var l = console.log;
+
+// Expose meta data for helmsman
+exports.command = {
+    description: 'Show and modify the configuration for a task'
+};
+
+
+if (require.main === module) {
+
+  // Load the API client
+  var client = ummon();
+
+  program
+    .option('--raw', 'Return raw json, don\'t bother pretty printing');
+
+  program.on('--help', function(){
+    console.log('  Examples:');
+    console.log('');
+    console.log('    # Create a task in the default collection that run every minute');
+    console.log('    $ ummon task create --name=list-home --command=ls --cwd="/home" --trigger.time="* * * * *"');
+    console.log('');
+    console.log('    # Create a task that you will trigger manually');
+    console.log('    $ ummon task create --collection app1 --name deploy --command "deploy --prod"');
+    console.log('');
+  });
+
+
+  program
+    .command('create <collection | task ID>')
+    .option('--command <command>', 'The command that will be run')
+    .option('--cwd <path>', 'The command that will be run. Optional')
+    .option('--trigger <trigger>', 'The tasks trigger (task id or cron)')
+    .option('--trigger.time <cron>', 'The cron time patter that the task should run')
+    .option('--trigger.after <task id>', 'The task id of the task this task should run after')
+    .option('--trigger.afterFailed <task id>', 'The task id of the task this task should run after')
+    .action(function(taskid, rawOptions){
+      program = ummoncli.loadLocalConfig(program);
+      client.configure(program);
+      ummoncli.errorIfBadTaskID(taskid);
+
+      var options = parseCliRawOptionsForTask(rawOptions);
+
+      taskid = taskid.split('.');
+      options.collection = taskid[0];
+      options.name = taskid[1];
+
+      createTask(options)
+    });
+
+  program
+    .command('update <taskid>')
+    .description('Update a specific attribute of a task. All unspecified attributes will not be touched')
+    .option('--command <command>', 'The command that will be run')
+    .option('--cwd <path>', 'The command that will be run. Optional')
+    .option('--trigger <trigger>', 'The tasks trigger (task id or cron)')
+    .option('--trigger.time <cron>', 'The cron time patter that the task should run')
+    .option('--trigger.after <task id>', 'The task id of the task this task should run after')
+    .option('--trigger.afterFailed <task id>', 'The task id of the task this task should run after')
+    .action(function(taskid, rawOptions){
+      // Gross, but this function is run before ummoncli.parse can load the config
+      program = ummoncli.loadLocalConfig(program);
+      client.configure(program);
+
+      ummoncli.errorIfBadTaskID(taskid);
+
+      var options = parseCliRawOptionsForTask(rawOptions);
+
+      client.updateTask(taskid, options, function(err, result){
+        ummoncli.ifError(err);
+        l('')
+        l(result.message.green);
+        l('')
+        ummoncli.formatTask(result.task);
+
+        process.exit()
+      })
+    });
+
+
+  function parseCliRawOptionsForTask(rawOptions) {
+    var options = {};
+
+    // Loop through the options we want, ignoring everything else, and splitting up dot formatted options
+    ['name', 'collection', 'command', 'cwd', 'trigger', 'trigger.time', 'trigger.after', 'trigger.afterFailed'].forEach(function(key){
+      if (key in rawOptions && typeof rawOptions[key] !== 'function' ) {
+        // Split up keys that have a dot in them (eg: 'trigger.time')
+        if (key.indexOf('.') !== -1) {
+          var splitKeys = key.split('.');
+          options[splitKeys[0]] = {};
+          options[splitKeys[0]][splitKeys[1]] = rawOptions[key];
+          delete options[key]
+        } else {
+          options[key] = rawOptions[key];
+        }
+      }
+    });
+
+    return options;
+  }
+
+  program
+    .command('copy <Source Task ID> <Destination Task ID>')
+    .description('Copy all of the settings from one task to another')
+    .action(function(srcTaskId, destTaskId, options){
+      // Gross, but this function is run before ummoncli.parse can load the config
+      program = ummoncli.loadLocalConfig(program);
+      client.configure(program);
+
+      [srcTaskId, destTaskId].forEach(function(task){
+        ummoncli.errorIfBadTaskID(task);
+      })
+
+      client.getTasks({task:srcTaskId}, function(err, result){
+        ummoncli.ifError(err);
+
+        var newTask = result.collections[0].tasks[srcTaskId.split('.')[1]];
+        var newTaskId = destTaskId.split('.');
+        newTask.collection = newTaskId[0];
+        newTask.name = newTaskId[1];
+        newTask.enabled = false;
+
+        if (newTask.trigger.afterFailed) {
+          newTask.trigger.afterFailed = newTask.trigger.afterFailed.replace(srcTaskId, destTaskId)
+        }
+        if (newTask.trigger.after) {
+          newTask.trigger.after = newTask.trigger.after.replace(srcTaskId, destTaskId)
+        }
+        if ("string" === typeof newTask.trigger) {
+          newTask.trigger = newTask.trigger.replace(srcTaskId, destTaskId)
+        }
+
+        createTask(newTask);
+      });
+    });
+
+
+  // This is gross. Sorry
+  program
+    .command('rename <oldTaskId> <newTaskId>')
+    .description('Rename a task')
+    .action(function(srcTaskId, destTaskId, options){
+      // Gross, but this function is run before ummoncli.parse can load the config
+      program = ummoncli.loadLocalConfig(program);
+      client.configure(program);
+
+      client.getTasks({task:srcTaskId}, function(err, result){
+        ummoncli.ifError(err);
+
+        var renamedTask = result.collections[0].tasks[srcTaskId.split('.')[1]];
+        var renamedTaskId = destTaskId.split('.');
+        renamedTask.collection = renamedTaskId[0];
+        renamedTask.name = renamedTaskId[1];
+
+        if (renamedTask.trigger.afterFailed) {
+          renamedTask.trigger.afterFailed = renamedTask.trigger.afterFailed.replace(srcTaskId, destTaskId)
+        }
+        if (renamedTask.trigger.after) {
+          renamedTask.trigger.after = renamedTask.trigger.after.replace(srcTaskId, destTaskId)
+        }
+        if ("string" === typeof renamedTask.trigger) {
+          renamedTask.trigger = renamedTask.trigger.replace(srcTaskId, destTaskId)
+        }
+
+        client.deleteTask(srcTaskId, function(err, result){
+          createTask(renamedTask);
+        })
+      });
+    });
+
+
+   program
+    .command('disable <taskid>')
+    .description('Disable a task')
+    .action(function(taskid, options){
+      // Gross, but this function is run before ummoncli.parse can load the config
+      program = ummoncli.loadLocalConfig(program);
+      client.configure(program);
+
+      client.disableTasks({"task":taskid}, function(err, result){
+        ummoncli.ifError(err);
+
+        l(result.message.green);
+
+        process.exit()
+      })
+    })
+
+  program
+    .command('enable <taskid>')
+    .description('Enable a task')
+    .action(function(taskid, options){
+      // Gross, but this function is run before ummoncli.parse can load the config
+      program = ummoncli.loadLocalConfig(program);
+      client.configure(program);
+
+      client.enableTasks({"task":taskid}, function(err, result){
+        ummoncli.ifError(err);
+        l(result.message.green);
+        l('')
+        l('The following tasks have been enabled:')
+
+        process.exit()
+      })
+    });
+
+  program
+    .command('delete <taskid>')
+    .description('Enable a task')
+    .action(function(taskid, options){
+      // Gross, but this function is run before ummoncli.parse can load the config
+      program = ummoncli.loadLocalConfig(program);
+      client.configure(program);
+
+      client.deleteTask(taskid, function(err, result){
+        ummoncli.ifError(err);
+        l("Task successfully deleted".green);
+        process.exit()
+      })
+    });
+
+  program
+    .command('*')
+    .action(function(taskid, options){
+      showTasks(taskid, options)
+    })
+
+  program = ummoncli.parse(program, process.argv);
+
+  // If no arguments are provided, show every task
+  if (program.args.length === 0) {
+    showTasks()
+  }
+
+  /**
+   * showTasks
+   *
+   * @param  {String} taskid
+   * @param  {Object} options commander.js object
+   */
+  function showTasks(taskid, options){
+    program = ummoncli.loadLocalConfig(program);
+    client.configure(program);
+
+    // Consider this a sear
+    program.task = taskid;
+
+    client.getTasks(program, function(err, result){
+      ummoncli.ifError(err);
+
+      if (program.raw) {
+        ummoncli.formatJson(result);
+        process.exit();
+      }
+
+      if (result.task) {
+        l('');
+        ummoncli.formatTask(result.task);
+      }
+
+      if (result.collections) {
+        var collections = result.collections;
+
+        collections.forEach(function(collection){
+          l('');
+          l('- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -');
+          l('');
+
+          var disabled = (collection.config.enabled === false) ? ' (disabled)'.red : '';
+
+          l('Collection: ' + collection.collection.white + disabled);
+
+          if (_.size(collection.defaults)) {
+            l('');
+            for (var key in collection.defaults) {
+              ummoncli.formatKeyVal('Default '+key, collection.defaults[key]);
+            }
+          }
+          l('')
+          for (var task in collection.tasks) {
+            ummoncli.formatTask(collection.tasks[task]);
+          }
+        })
+      }
+      process.exit()
+    })
+  }
+
+  function createTask(options) {
+    client.createTask(options, function(err, result){
+      ummoncli.ifError(err);
+
+      l('')
+      l(result.message.green);
+      l('')
+      ummoncli.formatTask(result.task);
+
+      process.exit();
+    });
+  }
+}

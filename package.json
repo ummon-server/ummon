@@ -1,31 +1,43 @@
 {
-  "name": "ummon-client",
+  "name": "ummon",
   "version": "0.0.11",
   "description": "The API client for ummon",
   "main": "client.js",
   "scripts": {
     "test": "tap test"
   },
+  "bin": {
+    "ummon": "./bin/ummon"
+  },
+  "directories": {
+    "bin": "./bin"
+  },
   "author": {
     "name": "Matt McManus",
-    "email": "mcmanus@punkave.com"
+    "email": "matt@mcmanus.io"
   },
   "bugs": {
-    "url": "https://github.com/punkave/ummon-client/issues"
+    "url": "https://github.com/punkave/ummon/issues"
   },
   "licenses": [
     {
       "type": "MIT",
-      "url": "https://github.com/punkave/ummon-client/blob/master/LICENSE-MIT"
+      "url": "https://github.com/punkave/ummon/blob/master/LICENSE-MIT"
     }
   ],
   "repository": {
     "type": "git",
-    "url": "git://github.com/punkave/ummon-client.git"
+    "url": "git://github.com/punkave/ummon.git"
   },
   "readmeFilename": "README.md",
   "dependencies": {
-    "restify": "~2.6.0"
+    "restify": "~2.6.0",
+    "colors": "~0.6.0-1",
+    "moment": "~2.1.0",
+    "underscore": "~1.4.4",
+    "helmsman": "~0.2.2",
+    "rc": "~0.3.0",
+    "commander": "~2.0.0"
   },
   "devDependencies": {
     "tap": "~0.4.2",
