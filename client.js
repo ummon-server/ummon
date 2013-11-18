@@ -189,11 +189,8 @@ module.exports = function(options){
     }
 
     api.get(logUrl, function(err, req, res, result) {
-      res.on('data', function(chunk){
-        console.log('DATA: '+ chunk)
-      })
-
-      callback(err, res.body); // This is weird that result is empty and res.body isn't
+      if (err) return callback(err);
+      callback(null, res.body); // This is weird that result is empty and res.body isn't
     });
   };
 
