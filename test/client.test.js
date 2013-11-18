@@ -13,15 +13,6 @@ test('Setup', function(t){
 });
 
 
-test('Show processes', function(t){
-  t.plan(1);
-
-  ummon.ps(function(data){
-    t.ok(data.workers, 'ps returns data');
-  });
-});
-
-
 test('Return logs', function(t){
   t.plan(1);
 
