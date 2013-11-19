@@ -1,11 +1,10 @@
-# ummon [![NPM version](https://badge.fury.io/js/ummon.png)](http://badge.fury.io/js/ummon) [![Build Status](https://secure.travis-ci.org/punkave/ummon.png?branch=master)](http://travis-ci.org/punkave/ummon) [![Dependency Status](https://gemnasium.com/punkave/ummon.png)](https://gemnasium.com/punkave/ummon)
-### Javascript API Client & Command Line Tool
+# ummon [![Build Status](https://secure.travis-ci.org/punkave/ummon.png?branch=master)](http://travis-ci.org/punkave/ummon)
 
-The command line interface to the [ummon server](https://github.com/punkave/ummon-server). Since `ummon-server` only communicates over an HTTP API, you can install this module on any computer and as long as you have the url and a user and pass you can interact with it.
+This package comprises a Node.js client library as well as a command line tool for communicating with the HTTP API of [ummon-server](https://github.com/punkave/ummon-server).
 
-[![NPM](https://nodei.co/npm/ummon.png?downloads=true)](https://nodei.co/npm/ummon/)
+[![NPM](https://nodei.co/npm/ummon.png)](https://nodei.co/npm/ummon/)
 
-# The Command Line Client
+# The CLI
 
 ## Installation
 
@@ -58,6 +57,8 @@ username=nameOfUser
 password=superTopSecretPassword
 ```
 
-Warning! Obviously if you save your password, it will be saved in clear text. Use appropriate caution
+Warning! Obviously, if you include your password in this file, it will be saved in clear text. Use appropriate caution.
 
-# [Ummon Javascript Client](http://punkave.github.io/ummon/)
+# The Client Library
+
+See generated docs at http://punkave.github.io/ummon/.
