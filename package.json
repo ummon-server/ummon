@@ -12,23 +12,9 @@
   "directories": {
     "bin": "./bin"
   },
-  "author": {
-    "name": "Matt McManus",
-    "email": "matt@mcmanus.io"
-  },
-  "bugs": {
-    "url": "https://github.com/punkave/ummon/issues"
-  },
-  "licenses": [
-    {
-      "type": "MIT",
-      "url": "https://github.com/punkave/ummon/blob/master/LICENSE-MIT"
-    }
-  ],
-  "repository": {
-    "type": "git",
-    "url": "git://github.com/punkave/ummon.git"
-  },
+  "author": "P'unk Avenue LLC",
+  "license": "MIT",
+  "repository": "git://github.com/punkave/ummon.git",
   "readmeFilename": "README.md",
   "dependencies": {
     "restify": "~2.6.0",
