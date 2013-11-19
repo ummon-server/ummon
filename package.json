@@ -40,7 +40,6 @@
     "commander": "~2.0.0"
   },
   "devDependencies": {
-    "tap": "~0.4.2",
-    "ummon-server": "*"
+    "tap": "~0.4.2"
   }
 }
