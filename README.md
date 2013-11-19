@@ -1,6 +1,6 @@
 # ummon [![Build Status](https://secure.travis-ci.org/punkave/ummon.png?branch=master)](http://travis-ci.org/punkave/ummon)
 
-This package comprises a Node.js client library as well as a command line tool for communicating with the HTTP API of [ummon-server](https://github.com/punkave/ummon-server).
+This package comprises a command line tool as well as a Node.js client library for communicating with the HTTP API of [ummon-server](https://github.com/punkave/ummon-server).
 
 [![NPM](https://nodei.co/npm/ummon.png)](https://nodei.co/npm/ummon/)
 
