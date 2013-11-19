@@ -1,52 +1,74 @@
-var test = require("tap").test;
+var http = require('http');
+var test = require('tap').test;
 
-var fork = require('child_process').fork;
-var ummon;
-var server;
 
-//                    Construct!
-// - - - - - - - - - - - - - - - - - - - - - - - - - 
+var testCollection = 'ummon-client-test';
+var ummon = require('../client')({url: 'http://localhost:8888'});
+
 test('Setup', function(t){
-  server = fork('../node_modules/ummon-server/server.js');
-  ummon = require('../client')({url: 'http://localhost:8888'});
-  t.end();
-});
-
-
-test('Return logs', function(t){
   t.plan(1);
-
-  ummon.showLog({'collection':'default'}, function(data){
-    t.ok(data, 'showLog returns data');
-  });
+  // Clear out collection if it exists
+  http.request({
+    port: 8888,
+    method: 'DELETE',
+    path: '/collections/' + testCollection
+  }, function (res) {
+    t.ok(true, 'Setup complete');
+  }).on('error', function (e) {
+    // Bail on connection error -- probably no server running
+    throw e;
+  }).end();
 });
 
 
 test('Create a task', function(t){
-  t.plan(1);
-  var task = {"name":"test", "command":"echo hello", "trigger": {"time":"* * * * *"}};
-  ummon.createTask(task, function(data){
-    t.ok(data, 'createTask returns data');
+  t.plan(2);
+  var task = {
+    name: 'hello',
+    collection: testCollection,
+    command: 'echo hello',
+    trigger: {time: '* * * * *'}
+  };
+  ummon.createTask(task, function(err, data){
+    t.ifError(err, 'No error from createTask');
+    t.equal(data.message, 'Task ' + testCollection + '.hello successfully created', 'createTask tells us a task was created');
   });
 });
 
 
-test('Show a task', function(t){
-  t.plan(1);
-  ummon.getTasks('default.test', function(err, data){
-    t.ok(data, 'createTask returns data');
+test('Get a task', function(t){
+  t.plan(2);
+  ummon.getTasks({task: testCollection + '.hello'}, function(err, data){
+    t.ifError(err, 'No error from getTasks');
+    t.equal(data.collections[0].tasks.hello.command, 'echo hello', 'getTasks returns the correct command');
+  });
+});
+
+
+test('Return logs', function(t){
+  t.plan(2);
+  // Only grab the logs from a second ago
+  var aSecondAgo = new Date(Date.now() - 1000);
+  ummon.showLog({from: aSecondAgo.toISOString()}, function(err, data){
+    t.ifError(err, 'No error from showLog');
+    // Get last non-empty line
+    var lastLine = data.split('\n').filter(function (line) {return line}).pop();
+    t.equal(JSON.parse(lastLine).apiUrl.substr(0, 4), '/log', 'showLog returns data');
   });
 });
 
 
 test('Teardown', function(t){
-  server.kill();
-  setImmediate(function() {
-    process.exit();
-  });
-  t.end();
-});
-
-process.on('uncaughtException', function(err) {
-  server.kill();
+  t.plan(1);
+  // Clean up by deleting the collection
+  http.request({
+    port: 8888,
+    method: 'DELETE',
+    path: '/collections/' + testCollection
+  }, function (res) {
+    setImmediate(function() {
+      process.exit();
+    });
+    t.ok(true, 'Teardown complete');
+  }).end();
 });
