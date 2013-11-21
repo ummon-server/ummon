@@ -32,10 +32,12 @@ if (require.main === module) {
 
   client.getStatus(function(err, result){
     ummoncli.ifError(err);
+    var atString = '     at '.green+program.url.white;
+    if (program.username) atString += ' with user '.green+program.username.white;
 
     l('')
     l('Connection successfully established with ummon-server'.green)
-    l('     at '+program.url.white+' with user '+program.username.white)
+    l(atString)
     l('')
 
     if (result.isPaused) {
