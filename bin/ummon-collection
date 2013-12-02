@@ -24,6 +24,22 @@ if (require.main === module) {
   var client = ummon();
 
   program
+    .command('get-config <collection>')
+    .description('Get the JSON config for a collection')
+    .action(function (collection, options) {
+      // Gross, but this function is run before ummoncli.parse can load the config
+      program = ummoncli.loadLocalConfig(program)
+      client.configure(program)
+
+      client.getCollectionConfig(program.args[0], function(err, result){
+        ummoncli.ifError(err);
+        l(JSON.stringify(result));
+        process.exit()
+      });
+    });
+
+
+  program
     .command('set-defaults [collection]')
     .description('Set the default settings for a particular collection')
     .option('--cwd <path>', 'The cwd for this particular collection')

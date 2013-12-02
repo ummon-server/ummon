@@ -196,6 +196,19 @@ module.exports = function(options){
 
 
   /**
+   * Return the config for a collection
+   *
+   * @param  {String}   collection A collection name
+   * @param  {Function} callback   callback(err, result)
+   */
+  client.getCollectionConfig = function(collection, callback) {
+    api.get(apiUrls.collections+'/'+collection, function(err, req, res, result) {
+      callback(err, result);
+    });
+  };
+
+
+  /**
    * Return the defautls for a particular collection
    *
    * @param  {String}   collection A collection name
