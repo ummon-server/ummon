@@ -235,7 +235,7 @@ if (require.main === module) {
 
   program
     .command('delete <collection>')
-    .description('Enable a collection')
+    .description('Delete a collection')
     .action(function(collection, options){
       // Gross, but this function is run before ummoncli.parse can load the config
       program = ummoncli.loadLocalConfig(program);
