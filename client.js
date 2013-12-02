@@ -354,10 +354,7 @@ module.exports = function(options){
    */
   client.createTask = function(config, callback){
     api.post(apiUrls.createTask, config, function(err, req, res, result) {
-      if (err) {
-        return callback(err);
-      }
-
+      if (err) return callback(err);
       callback(null, result);
     });
   };
