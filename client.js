@@ -209,6 +209,19 @@ module.exports = function(options){
 
 
   /**
+   * Sets the config for a collection
+   *
+   * @param  {String}   collection A collection name
+   * @param  {Function} callback   callback(err, result)
+   */
+  client.setCollectionConfig = function(collection, config, callback) {
+    api.put(apiUrls.collections+'/'+collection, config, function(err, req, res, result) {
+      callback(err, result);
+    });
+  };
+
+
+  /**
    * Return the defautls for a particular collection
    *
    * @param  {String}   collection A collection name

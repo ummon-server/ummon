@@ -4,6 +4,7 @@ var test = require('tap').test;
 
 var testCollection = 'ummon-client-test';
 var ummon = require('../client')({url: 'http://localhost:8888'});
+var config;
 
 test('Setup', function(t){
   t.plan(1);
@@ -41,6 +42,34 @@ test('Get a task', function(t){
   ummon.getTasks({task: testCollection + '.hello'}, function(err, data){
     t.ifError(err, 'No error from getTasks');
     t.equal(data.collections[0].tasks.hello.command, 'echo hello', 'getTasks returns the correct command');
+  });
+});
+
+
+test('Get collection config', function(t){
+  t.plan(2);
+  ummon.getCollectionConfig(testCollection, function(err, data){
+    t.ifError(err, 'No error from getCollectionConfig');
+    t.equal(data.tasks.hello.command, 'echo hello', 'getCollectionConfig returns the collection');
+    // Save config for the set config test
+    config = data;
+  });
+});
+
+
+test('Delete the collection', function(t){
+  t.plan(1);
+  ummon.deleteCollection(testCollection, function(err){
+    t.ifError(err, 'No error from deleteCollection');
+  });
+});
+
+
+test('Set collection config', function(t){
+  t.plan(2);
+  ummon.setCollectionConfig(testCollection, config, function(err, data){
+    t.ifError(err, 'No error from getCollectionConfig');
+    t.equal(data.collections[0].tasks.hello.command, 'echo hello', 'Set collection returns the collection');
   });
 });
 

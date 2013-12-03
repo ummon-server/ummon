@@ -26,15 +26,47 @@ if (require.main === module) {
   program
     .command('get-config <collection>')
     .description('Get the JSON config for a collection')
+    .option('--pretty', 'Make the output pretty')
     .action(function (collection, options) {
       // Gross, but this function is run before ummoncli.parse can load the config
       program = ummoncli.loadLocalConfig(program)
       client.configure(program)
 
-      client.getCollectionConfig(program.args[0], function(err, result){
+      client.getCollectionConfig(collection, function(err, result){
         ummoncli.ifError(err);
-        l(JSON.stringify(result));
+        if (options.pretty) {
+          l(JSON.stringify(result, null, 2));
+        } else {
+          l(JSON.stringify(result));
+        }
         process.exit()
+      });
+    });
+
+
+  program
+    .command('set-config <collection>')
+    .description('Set the config for a collection by feeding the JSON config into stdin')
+    .action(function (collection, options) {
+      // Gross, but this function is run before ummoncli.parse can load the config
+      program = ummoncli.loadLocalConfig(program)
+      client.configure(program)
+
+      var data = '';
+      process.stdin.resume();
+      process.stdin.setEncoding('utf8');
+
+      process.stdin.on('data', function(chunk) {
+        data += chunk;
+      });
+
+      process.stdin.on('end', function() {
+        //console.log(data);
+        client.setCollectionConfig(collection, JSON.parse(data), function(err, result){
+          ummoncli.ifError(err);
+          l(JSON.stringify(result));
+          process.exit()
+        });
       });
     });
 
