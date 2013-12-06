@@ -59,7 +59,7 @@ exports.formatTask = function(task) {
 
 
 exports.formatJson = function(data) {
-  console.log(util.inspect(data, { showHidden: true, depth: null, colors: true }));
+  console.log(util.inspect(data, { showHidden: true, depth: null }));
 }
 
 
