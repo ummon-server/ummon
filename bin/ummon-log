@@ -14,7 +14,7 @@ var l = console.log;
 
 // Expose meta data to helmsman
 exports.command = {
-    description: 'Show recent log output. Filter logs by using --collection, --task or --run (only one!)'
+    description: 'Show recent log output. Filter by collection, task, or run.'
 };
 
 
@@ -22,16 +22,16 @@ if (require.main === module) {
   program
     .usage('<collection | task id | run id> [options]')
     // .option('-f, --follow', 'Follow the logs. Think tail -f')
-    .option('--runs-only', 'Show only a history of run tasks, not task output')
-    .option('--from <time>', 'Show logs from this date. Format: "YYYY-MM-DD HH:mm". Defaults to the last 24 hours')
+    .option('--runs-only', 'Show only a history of run tasks, not task output.')
+    .option('--from <time>', 'Show logs from this date. Format: "YYYY-MM-DD HH:mm". Defaults to the last 24 hours.')
     .option('--to <time>', 'Show logs to this date. Format: "YYYY-MM-DD HH:mm".');
 
   program.on('--help', function(){
-    l('Pipe raw json to `bunyan` for more filtering and easier output')
+    l('Pipe raw JSON to `bunyan` for more filtering and easier output')
     l()
     l('Examples:')
     l()
-    l('   ummon log --runs-only --from "2013-08-29" --to "2013-08-31"')
+    l('   ummon log test --runs-only --from "2013-08-29" --to "2013-08-31"')
   })
 
   program = ummoncli.parse(program, process.argv);
