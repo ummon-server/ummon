@@ -15,6 +15,7 @@ module.exports = function(options){
   apiUrls.config = '/config';
   apiUrls.status = '/status';
   apiUrls.log = '/log';
+  apiUrls.run = '/run';
   apiUrls.tasks = '/tasks';
   apiUrls.createTask = apiUrls.tasks + '/new';
   apiUrls.collections = '/collections';
@@ -423,6 +424,18 @@ module.exports = function(options){
    */
   client.deleteCollection = function(collection, callback){
     api.del(apiUrls.collections + '/' + collection, function(err, req, res) {
+      callback(err);
+    });
+  };
+
+  /**
+   * Run a task or a one-off command
+   *
+   * @param  {String}   task
+   * @param  {Function} callback   callback(err)
+   */
+  client.run = function(task, callback){
+    api.post(apiUrls.run, {task: task}, function(err, req, res) {
       callback(err);
     });
   };

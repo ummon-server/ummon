@@ -74,15 +74,28 @@ test('Set collection config', function(t){
 });
 
 
+test('Manually run a task', function(t){
+  t.plan(1);
+  ummon.run(testCollection+'.hello', function(err, data){
+    t.ifError(err, 'No error from running a task');
+  });
+});
+
+
+test('Manually run a one-off command', function(t){
+  t.plan(1);
+  ummon.run('echo hello', function(err, data){
+    t.ifError(err, 'No error from running a command');
+  });
+});
+
+
 test('Return logs', function(t){
-  t.plan(2);
+  t.plan(1);
   // Only grab the logs from a second ago
   var aSecondAgo = new Date(Date.now() - 1000);
   ummon.showLog({from: aSecondAgo.toISOString()}, function(err, data){
     t.ifError(err, 'No error from showLog');
-    // Get last non-empty line
-    var lastLine = data.split('\n').filter(function (line) {return line}).pop();
-    t.equal(JSON.parse(lastLine).apiUrl.substr(0, 4), '/log', 'showLog returns data');
   });
 });
 

@@ -1,0 +1,42 @@
+#!/usr/bin/env node
+
+// helmsman
+
+var program = require('commander');
+var ummon = require('../client');
+var util = require('util');
+var moment = require('moment');
+var _ = require('underscore');
+
+require('colors');
+
+var ummoncli = require('../cli-utils.js');
+
+// Shorthands
+var l = console.log;
+
+// Expose meta data for helmsman
+exports.command = {
+    description: 'Manually run a task or one-off command'
+};
+
+
+if (require.main === module) {
+  program
+    .usage('<task id | command>')
+
+  // Load the API client
+  var client = ummon();
+
+  program = ummoncli.parse(program, process.argv);
+
+  var task = program.args[0];
+  if (!task) return program.outputHelp();
+
+  client.run(task, function(err){
+    ummoncli.ifError(err);
+    l('')
+    l("Task or command succesfully added to the queue".green);
+    process.exit()
+  });
+}
