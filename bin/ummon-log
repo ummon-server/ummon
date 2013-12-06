@@ -14,7 +14,7 @@ var l = console.log;
 
 // Expose meta data to helmsman
 exports.command = {
-    description: 'Show recent log output. Filter by collection, task, or run.'
+    description: 'Show recent log output, filtered by collection, task, or run'
 };
 
 
