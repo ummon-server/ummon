@@ -23,12 +23,12 @@ exports.command = {
 
 if (require.main === module) {
   program
-    .usage('<task id | command>')
-
-  // Load the API client
-  var client = ummon();
+    .usage('<task_id | command>')
 
   program = ummoncli.parse(program, process.argv);
+
+  // Load the API client
+  var client = ummon(program);
 
   var task = program.args[0];
   if (!task) return program.outputHelp();
