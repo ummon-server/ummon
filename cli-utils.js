@@ -19,6 +19,10 @@ exports.formatTask = function(task) {
   var command = task.command;
   command += (task.cwd)?' (in '+task.cwd +')':'';
   l(heading + ': $ '.grey + command);
+  
+  if (task.description) {
+    l('Description: '+ task.description.white);
+  }
 
   if (task.trigger) {
     if (task.trigger.afterFailed) {
