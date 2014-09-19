@@ -30,16 +30,16 @@ if (require.main === module) {
     console.log('  Examples:');
     console.log('');
     console.log('    # Create a task in the default collection that run every minute');
-    console.log('    $ ummon task create --name=list-home --command=ls --cwd="/home" --trigger.time="* * * * *"');
+    console.log('    $ ummon task create test.home --command=ls --cwd="/home" --trigger.time="* * * * *"');
     console.log('');
     console.log('    # Create a task that you will trigger manually');
-    console.log('    $ ummon task create --collection app1 --name deploy --command "deploy --prod"');
+    console.log('    $ ummon task create app1.name --command "deploy --prod"');
     console.log('');
   });
 
 
   program
-    .command('create <collection | task ID>')
+    .command('create <collection.taskid>')
     .option('--command <command>', 'The command that will be run')
     .option('--cwd <path>', 'The command that will be run. Optional')
     .option('--trigger <trigger>', 'The tasks trigger (task id or cron)')
