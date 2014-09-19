@@ -42,6 +42,7 @@ if (require.main === module) {
     .command('create <collection.taskid>')
     .option('--command <command>', 'The command that will be run')
     .option('--cwd <path>', 'The command that will be run. Optional')
+    .option('--description <description>', 'Description of the task. Optional')
     .option('--trigger <trigger>', 'The tasks trigger (task id or cron)')
     .option('--trigger.time <cron>', 'The cron time patter that the task should run')
     .option('--trigger.after <task id>', 'The task id of the task this task should run after')
@@ -65,6 +66,7 @@ if (require.main === module) {
     .description('Update a specific attribute of a task. All unspecified attributes will not be touched')
     .option('--command <command>', 'The command that will be run')
     .option('--cwd <path>', 'The command that will be run. Optional')
+    .option('--description <description>', 'Description of the task. Optional')
     .option('--trigger <trigger>', 'The tasks trigger (task id or cron)')
     .option('--trigger.time <cron>', 'The cron time patter that the task should run')
     .option('--trigger.after <task id>', 'The task id of the task this task should run after')
@@ -94,7 +96,7 @@ if (require.main === module) {
     var options = {};
 
     // Loop through the options we want, ignoring everything else, and splitting up dot formatted options
-    ['name', 'collection', 'command', 'cwd', 'trigger', 'trigger.time', 'trigger.after', 'trigger.afterFailed'].forEach(function(key){
+    ['name', 'collection', 'command', 'cwd', 'description', 'trigger', 'trigger.time', 'trigger.after', 'trigger.afterFailed'].forEach(function(key){
       if (key in rawOptions && typeof rawOptions[key] !== 'function' ) {
         // Split up keys that have a dot in them (eg: 'trigger.time')
         if (key.indexOf('.') !== -1) {
