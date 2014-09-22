@@ -21,7 +21,8 @@ exports.command = {
 if (require.main === module) {
   program
     .option('--pause', 'Pause the sever. (Prevents new jobs from being started)')
-    .option('--unpause', 'UnPause the sever');
+    .option('--unpause', 'UnPause the sever')
+    .option('--autoSave <bool>', 'Turn autoSave on/off');
 
   program = ummoncli.parse(program, process.argv);
 
@@ -42,6 +43,14 @@ if (require.main === module) {
       ummoncli.ifError(err);
 
       l('Ummon is no longer paused');
+
+      process.exit();
+    });
+  } else if (program.autoSave) {
+    client.setConfig( {autoSave: program.autoSave}, function(err, result){
+      ummoncli.ifError(err);
+
+      l('autoSave updated');
 
       process.exit();
     });
