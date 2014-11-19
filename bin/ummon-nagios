@@ -1,0 +1,108 @@
+#!/usr/bin/env node
+
+// helmsman
+
+var program = require('commander');
+var ummon = require('../client');
+var util = require('util');
+var moment = require('moment');
+var _ = require('underscore');
+
+var ummoncli = require('../cli-utils.js');
+
+// Shorthands
+var l = console.log;
+
+// Expose meta data for helmsman
+exports.command = {
+    description: 'Run various sanity checks, and return/print in the format expected by the nagios plugin API'
+};
+
+
+var nagios_alerts = [
+  {
+    level: 'WARNING',
+    name: "Nagios is paused",
+    isTrue: function(result) {
+      return result.isPaused;
+    }
+  },
+  {
+    level: 'CRITICAL',
+    name: "Always crazy",
+    isTrue: function(result) {
+      return true;
+    }
+  }
+];
+var status_mapping = [
+  'OK',
+  'WARNING',
+  'CRITICAL',
+  'UNKNOWN'
+];
+// Add numerical exit status to each alert
+_.each(
+  nagios_alerts, 
+  function(alert) { 
+    alert.exitStatus = status_mapping.indexOf(alert.level);
+  }
+);
+
+
+if (require.main === module) {
+  program
+    .option('-v, --verbose', 'Show verbose information');
+
+  program = ummoncli.parse(program, process.argv);
+
+  var client = ummon(program);
+
+  client.getStatus(function(err, result){
+    if (err) {
+      // Report a status of UNKNOWN to nagios
+      l("UNKNOWN: Ummon is unreachable");
+      process.exit(3);
+    }
+
+
+    var trueAlerts = _.filter(nagios_alerts, function(alert) {
+      return alert.isTrue(result);
+    });
+
+    // Format primary output of nagios check
+    var output = (trueAlerts.length == 0 
+      ? "OK" 
+      : _.map(
+        // Sort by exit status DESC, so the most critical float to the top
+        _.sortBy(trueAlerts, 'exitStatus').reverse(),
+        function(alert) {
+          return alert.level + ": " + alert.name;
+        }
+      ).join(';')
+    );
+
+    var exitStatus = (trueAlerts.length == 0 
+      ? 0 
+      : _.max(trueAlerts, function(alert) { return alert.exitStatus;}).exitStatus
+    );
+
+
+    var perfdata = _.map(
+      {
+        "queue": result.queue.length,
+        "workers_active": result.workers.length,
+        "workers_total": result.maxWorkers,
+        "tasks_total": result.totalTasks
+      },
+      function(val, key) {
+        return key + ":" + val;
+      }
+    ).join(';');
+
+
+
+    console.log(output + "|" + perfdata);
+    process.exit(exitStatus);
+  });
+}
