@@ -33,8 +33,20 @@ var nagios_alerts = [
       // but isn't. Specifically, if a task is in process, the next instance _should_ wait in the queue even
       // if there's a spare worker.
       var workersAreFree = result.maxWorkers > result.workers.length;
-      var tasksArePending = /*result.queue.length > 0 &&*/ _.difference(result.queue, result.workers).length > 0;
+      var tasksArePending = _.difference(result.queue, result.workers).length > 0;
       return workersAreFree && tasksArePending && !result.isPaused;
+    }
+  },
+  {
+    level: "WARNING",
+    name:  "Some collections are missing",
+    isTrue: function(result) {
+      // Sometimes when ummon-server boots, it fails to read all the collections' config files.
+      // There is no good way to detect this on the client side, but a hacky way is to look at the last 
+      // collection alphabetically and make sure it's past a pre-set threshold
+      var lastCollection = _.last(result.collections.sort());
+      var threshold = 'w';
+      return lastCollection < threshold;
     }
   }
 ];
@@ -67,7 +79,6 @@ if (require.main === module) {
       console.log("UNKNOWN: Ummon is unreachable");
       process.exit(3);
     }
-
 
     var trueAlerts = _.filter(nagios_alerts, function(alert) {
       return alert.isTrue(result);
