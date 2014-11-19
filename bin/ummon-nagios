@@ -10,9 +10,6 @@ var _ = require('underscore');
 
 var ummoncli = require('../cli-utils.js');
 
-// Shorthands
-var l = console.log;
-
 // Expose meta data for helmsman
 exports.command = {
     description: 'Run various sanity checks, and return/print in the format expected by the nagios plugin API'
@@ -28,10 +25,16 @@ var nagios_alerts = [
     }
   },
   {
-    level: 'CRITICAL',
-    name: "Always crazy",
+    level: "CRITICAL",
+    name:  "Queue is stuck",
     isTrue: function(result) {
-      return true;
+      // There is an occasional error state where ummon-server stops processing new tasks from the queue.
+      // We need to check if there are free workers, and if there are tasks that it _should_ be processing
+      // but isn't. Specifically, if a task is in process, the next instance _should_ wait in the queue even
+      // if there's a spare worker.
+      var workersAreFree = result.maxWorkers > result.workers.length;
+      var tasksArePending = /*result.queue.length > 0 &&*/ _.difference(result.queue, result.workers).length > 0;
+      return workersAreFree && tasksArePending && !result.isPaused;
     }
   }
 ];
@@ -61,7 +64,7 @@ if (require.main === module) {
   client.getStatus(function(err, result){
     if (err) {
       // Report a status of UNKNOWN to nagios
-      l("UNKNOWN: Ummon is unreachable");
+      console.log("UNKNOWN: Ummon is unreachable");
       process.exit(3);
     }
 
