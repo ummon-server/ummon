@@ -36,18 +36,6 @@ var nagios_alerts = [
       var tasksArePending = _.difference(result.queue, result.workers).length > 0;
       return workersAreFree && tasksArePending && !result.isPaused;
     }
-  },
-  {
-    level: "WARNING",
-    name:  "Some collections are missing",
-    isTrue: function(result) {
-      // Sometimes when ummon-server boots, it fails to read all the collections' config files.
-      // There is no good way to detect this on the client side, but a hacky way is to look at the last 
-      // collection alphabetically and make sure it's past a pre-set threshold
-      var lastCollection = _.last(result.collections.sort());
-      var threshold = 'w';
-      return lastCollection < threshold;
-    }
   }
 ];
 var status_mapping = [
@@ -56,20 +44,26 @@ var status_mapping = [
   'CRITICAL',
   'UNKNOWN'
 ];
-// Add numerical exit status to each alert
-_.each(
-  nagios_alerts, 
-  function(alert) { 
-    alert.exitStatus = status_mapping.indexOf(alert.level);
-  }
-);
-
 
 if (require.main === module) {
-  program
-    .option('-v, --verbose', 'Show verbose information');
+  program.option('-a --alertfile <filename>', 'JS file with extra alert conditions');
 
   program = ummoncli.parse(program, process.argv);
+
+  if (program.alertfile) {
+    var fullPath = (program.alertfile[0]=='/'
+      ? program.alertfile
+      : process.cwd() + '/' + program.alertfile);
+    nagios_alerts = _.extend(nagios_alerts, require(fullPath));
+  }
+
+  // Add numerical exit status to each alert
+  _.each(
+    nagios_alerts,
+    function(alert) {
+      alert.exitStatus = status_mapping.indexOf(alert.level);
+    }
+  );
 
   var client = ummon(program);
 
