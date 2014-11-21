@@ -1,0 +1,116 @@
+#!/usr/bin/env node
+
+// helmsman
+
+var program = require('commander');
+var ummon = require('../client');
+var util = require('util');
+var moment = require('moment');
+var _ = require('underscore');
+
+var ummoncli = require('../cli-utils.js');
+
+// Expose meta data for helmsman
+exports.command = {
+    description: 'Run various sanity checks, and return/print in the format expected by the nagios plugin API'
+};
+
+
+var nagios_alerts = [
+  {
+    level: 'WARNING',
+    name: "Nagios is paused",
+    isTrue: function(result) {
+      return result.isPaused;
+    }
+  },
+  {
+    level: "CRITICAL",
+    name:  "Queue is stuck",
+    isTrue: function(result) {
+      // There is an occasional error state where ummon-server stops processing new tasks from the queue.
+      // We need to check if there are free workers, and if there are tasks that it _should_ be processing
+      // but isn't. Specifically, if a task is in process, the next instance _should_ wait in the queue even
+      // if there's a spare worker.
+      var workersAreFree = result.maxWorkers > result.workers.length;
+      var tasksArePending = _.difference(result.queue, result.workers).length > 0;
+      return workersAreFree && tasksArePending && !result.isPaused;
+    }
+  }
+];
+var status_mapping = [
+  'OK',
+  'WARNING',
+  'CRITICAL',
+  'UNKNOWN'
+];
+
+if (require.main === module) {
+  program.option('-a --alertfile <filename>', 'JS file with extra alert conditions');
+
+  program = ummoncli.parse(program, process.argv);
+
+  if (program.alertfile) {
+    var fullPath = (program.alertfile[0]=='/'
+      ? program.alertfile
+      : process.cwd() + '/' + program.alertfile);
+    nagios_alerts = _.extend(nagios_alerts, require(fullPath));
+  }
+
+  // Add numerical exit status to each alert
+  _.each(
+    nagios_alerts,
+    function(alert) {
+      alert.exitStatus = status_mapping.indexOf(alert.level);
+    }
+  );
+
+  var client = ummon(program);
+
+  client.getStatus(function(err, result){
+    if (err) {
+      // Report a status of UNKNOWN to nagios
+      console.log("UNKNOWN: Ummon is unreachable");
+      process.exit(3);
+    }
+
+    var trueAlerts = _.filter(nagios_alerts, function(alert) {
+      return alert.isTrue(result);
+    });
+
+    // Format primary output of nagios check
+    var output = (trueAlerts.length == 0 
+      ? "OK" 
+      : _.map(
+        // Sort by exit status DESC, so the most critical float to the top
+        _.sortBy(trueAlerts, 'exitStatus').reverse(),
+        function(alert) {
+          return alert.level + ": " + alert.name;
+        }
+      ).join(';')
+    );
+
+    var exitStatus = (trueAlerts.length == 0 
+      ? 0 
+      : _.max(trueAlerts, function(alert) { return alert.exitStatus;}).exitStatus
+    );
+
+
+    var perfdata = _.map(
+      {
+        "queue": result.queue.length,
+        "workers_active": result.workers.length,
+        "workers_total": result.maxWorkers,
+        "tasks_total": result.totalTasks
+      },
+      function(val, key) {
+        return key + ":" + val;
+      }
+    ).join(';');
+
+
+
+    console.log(output + "|" + perfdata);
+    process.exit(exitStatus);
+  });
+}
