@@ -1,6 +1,6 @@
 {
   "name": "ummon",
-  "version": "0.1.5",
+  "version": "0.1.6",
   "description": "The API client for ummon",
   "main": "client.js",
   "scripts": {
