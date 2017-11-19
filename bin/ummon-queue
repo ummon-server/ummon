@@ -77,7 +77,7 @@ if (require.main === module) {
 
       if (response.queue.length) {
         l('Your queue currently has ' + response.queue.length.toString().white + ' runs:')
-        _.each(result.queue, function(item){
+        _.each(response.queue, function(item){
           l('   |- '+item)
         })
       } else {
