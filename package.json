@@ -17,15 +17,15 @@
   "repository": "git://github.com/punkave/ummon.git",
   "readmeFilename": "README.md",
   "dependencies": {
-    "restify": "~2.6.0",
-    "colors": "~0.6.0-1",
-    "moment": "~2.2.0",
-    "underscore": "~1.5.2",
-    "helmsman": "~0.2.2",
-    "rc": "~0.3.0",
-    "commander": "~2.0.0"
+    "colors": "^1.1.2",
+    "commander": "^2.11.0",
+    "helmsman": "^1.0.3",
+    "moment": "^2.19.2",
+    "rc": "^1.2.2",
+    "restify-clients": "^1.5.2",
+    "underscore": "^1.8.3"
   },
   "devDependencies": {
-    "tap": "~0.4.2"
+    "tap": "^10.7.3"
   }
 }

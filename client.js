@@ -5,7 +5,7 @@
  * Module dependencies.
  */
 var assert = require('assert');
-var restify = require('restify');
+var restify = require('restify-clients');
 var url = require('url');
 
 
