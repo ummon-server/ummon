@@ -4,9 +4,6 @@ var _ = require('underscore');
 var rc = require('rc');
 var moment = require('moment');
 
-var l = console.log;
-
-
 /**
  * Format an ummon task
  *
@@ -18,24 +15,24 @@ exports.formatTask = function(task) {
 
   var command = task.command;
   command += (task.cwd)?' (in '+task.cwd +')':'';
-  l(heading + ': $ '.grey + command);
-  
+  console.log(heading + ': $ '.grey + command);
+
   if (task.description) {
-    l('Description: '+ task.description.white);
+    console.log('Description: '+ task.description.white);
   }
 
   if (task.trigger) {
     if (task.trigger.afterFailed) {
-      l('Trigger after Failed: '+task.trigger.afterFailed);
+      console.log('Trigger after Failed: '+task.trigger.afterFailed);
     }
     else {
       var trigger = task.trigger.time || task.trigger.after || task.trigger;
-      l('Trigger: '+ trigger)
+      console.log('Trigger: '+ trigger)
     }
   }
 
   if (task.lastSuccessfulRun) {
-    l('Last successful run: ' + moment(task.lastSuccessfulRun).calendar())
+    console.log('Last successful run: ' + moment(task.lastSuccessfulRun).calendar())
   }
 
   if (task.recentExitCodes.length) {
@@ -50,15 +47,15 @@ exports.formatTask = function(task) {
 
     // This isn't pretty but it works for now
     if (percentage < 20) {
-      l(label + percentage.toString().red + '%'.red);
+      console.log(label + percentage.toString().red + '%'.red);
     } else if (percentage == 100) {
-      l(label + percentage.toString().green + '%'.green);
+      console.log(label + percentage.toString().green + '%'.green);
     } else {
-      l(label + percentage.toString().yellow + '%'.yellow);
+      console.log(label + percentage.toString().yellow + '%'.yellow);
     }
   }
 
-  l('');
+  console.log('');
 }
 
 
@@ -71,7 +68,7 @@ exports.formatJson = function(data) {
  * A simple helper to print key:value pairs
  */
 exports.formatKeyVal = function(key, val) {
-  l(key + ': '+val);
+  console.log(key + ': '+val);
 }
 
 
@@ -89,14 +86,14 @@ exports.errorIfBadTaskID = function(task) {
  */
 exports.ifError = ifError = function(err) {
   if (err) {
-    l('')
-    util.error('** ERROR **'.red);
-    if (err.statusCode) { util.error(' ('+err.statusCode+')') }
-    l('');
+    console.log('')
+    console.error('** ERROR **'.red);
+    if (err.statusCode) { console.error(' ('+err.statusCode+')') }
+    console.log('');
     if (err.message) {
-      util.error(err.message.red);
+      console.error(err.message.red);
     } else {
-      util.error(err.red);
+      console.error(err.red);
     }
     process.exit(1);
   }
