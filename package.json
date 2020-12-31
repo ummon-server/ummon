@@ -7,7 +7,7 @@
     "test": "tap test"
   },
   "bin": {
-    "ummon": "./bin/ummon"
+    "ummon": "bin/ummon"
   },
   "directories": {
     "bin": "./bin"
