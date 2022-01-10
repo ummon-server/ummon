@@ -5,7 +5,7 @@
   "requires": true,
   "packages": {
     "": {
-      "version": "0.1.8",
+      "version": "0.1.10",
       "license": "MIT",
       "dependencies": {
         "colors": "^1.1.2",
@@ -154,10 +154,7 @@
         "node >=0.10.0"
       ],
       "dependencies": {
-        "dtrace-provider": "0.8.6",
-        "moment": "2.21.0",
-        "mv": "2.1.1",
-        "safe-json-stringify": "1.1.0"
+        "moment": "2.21.0"
       },
       "bin": {
         "bunyan": "bin/bunyan"
@@ -1806,8 +1803,7 @@
       "dependencies": {
         "async": "^1.4.0",
         "optimist": "^0.6.1",
-        "source-map": "^0.4.4",
-        "uglify-js": "^2.6"
+        "source-map": "^0.4.4"
       },
       "bin": {
         "handlebars": "bin/handlebars"
@@ -3333,7 +3329,6 @@
       "optional": true,
       "dependencies": {
         "source-map": "~0.5.1",
-        "uglify-to-browserify": "~1.0.0",
         "yargs": "~3.10.0"
       },
       "bin": {
@@ -3923,12 +3918,8 @@
       "dependencies": {
         "asn1": "0.2.3",
         "assert-plus": "1.0.0",
-        "bcrypt-pbkdf": "1.0.1",
         "dashdash": "1.14.1",
-        "ecc-jsbn": "0.1.1",
-        "getpass": "0.1.7",
-        "jsbn": "0.1.1",
-        "tweetnacl": "0.14.5"
+        "getpass": "0.1.7"
       },
       "engines": {
         "node": ">=0.10.0"
@@ -4049,7 +4040,6 @@
         "escape-string-regexp": "1.0.5",
         "glob": "7.1.2",
         "js-yaml": "3.11.0",
-        "readable-stream": "2.3.5",
         "tap-parser": "5.4.0",
         "unicode-length": "1.0.3"
       },
@@ -4096,8 +4086,7 @@
       "dev": true,
       "dependencies": {
         "events-to-array": "1.1.2",
-        "js-yaml": "3.11.0",
-        "readable-stream": "2.3.5"
+        "js-yaml": "3.11.0"
       },
       "bin": {
         "tap-parser": "bin/cmd.js"
@@ -4210,9 +4199,9 @@
       "optional": true
     },
     "node_modules/underscore": {
-      "version": "1.8.3",
-      "resolved": "https://registry.npmjs.org/underscore/-/underscore-1.8.3.tgz",
-      "integrity": "sha1-Tz+1OxBuYJf8+ctBCfKl6b36UCI="
+      "version": "1.12.1",
+      "resolved": "https://registry.npmjs.org/underscore/-/underscore-1.12.1.tgz",
+      "integrity": "sha512-hEQt0+ZLDVUMhebKxL4x1BTtDY7bavVofhZ9KZ4aI26X9SRaE+Y3m83XUL1UP2jn8ynjndwCCpEHdUG+9pP1Tw=="
     },
     "node_modules/underscore.string": {
       "version": "2.3.3",
@@ -7607,9 +7596,9 @@
       "optional": true
     },
     "underscore": {
-      "version": "1.8.3",
-      "resolved": "https://registry.npmjs.org/underscore/-/underscore-1.8.3.tgz",
-      "integrity": "sha1-Tz+1OxBuYJf8+ctBCfKl6b36UCI="
+      "version": "1.12.1",
+      "resolved": "https://registry.npmjs.org/underscore/-/underscore-1.12.1.tgz",
+      "integrity": "sha512-hEQt0+ZLDVUMhebKxL4x1BTtDY7bavVofhZ9KZ4aI26X9SRaE+Y3m83XUL1UP2jn8ynjndwCCpEHdUG+9pP1Tw=="
     },
     "underscore.string": {
       "version": "2.3.3",
