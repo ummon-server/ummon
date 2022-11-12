@@ -19,7 +19,7 @@
   "dependencies": {
     "colors": "^1.1.2 <= 1.4.0",
     "commander": "^2.14.1",
-    "helmsman": "^1.0.3",
+    "helmsman": "^2.0.1",
     "moment": "^2.21.0",
     "rc": "^1.2.5",
     "restify-clients": "^1.5.2",
